@@ -1,0 +1,48 @@
+---
+description: Frontend standards for React, Next.js, Tailwind, accessibility, and UX
+alwaysApply: true
+---
+
+# Frontend Standards
+
+## Stack
+
+- React + Next.js App Router + TypeScript (strict)
+- Tailwind CSS with design tokens in `globals.css`
+- shadcn/ui for primitives; Framer Motion for section entrance only
+- Server Components by default; `"use client"` only when needed
+
+## Architecture
+
+- Modular components under `src/components/` — one concern per file
+- Marketing sections in `src/components/marketing/<name>-section.tsx`
+- Shared layout in `src/components/layout/`; motion wrappers in `src/components/motion/`
+- Composition over prop drilling; use `cn()` for class merging
+
+## HTML & Accessibility (WCAG)
+
+- Semantic elements: `header`, `nav`, `main`, `section`, `footer`, proper heading order
+- All interactive elements keyboard accessible with visible `:focus-visible` rings
+- Labels for inputs; `aria-label` when no visible label; `sr-only` for screen-reader text
+- Respect `prefers-reduced-motion`; do not block zoom (`maximumScale: 1` is forbidden)
+- Body text contrast ≥ 4.5:1; large text ≥ 3:1
+
+## UI States (required for interactive blocks)
+
+- Default, hover, focus, active, disabled
+- Loading, empty, and error states for async or data-driven UI
+
+## Design
+
+- Mobile-first responsive layouts; test at 320px, 768px, 1280px
+- Consistent spacing (4px grid); use `Section` for vertical rhythm
+- Minimalist interfaces; avoid clutter; clear visual hierarchy
+- Subtle animations only; CSS for micro-interactions, Framer for scroll reveals
+
+## Nielsen Heuristics Checklist
+
+Before shipping UI, verify: visibility of status, real-world match, user control, consistency, error prevention, recognition over recall, flexibility, aesthetic minimalism, error recovery, help/documentation where needed.
+
+## Pre-ship Review
+
+Evaluate every change for: accessibility, responsiveness, visual hierarchy, usability, consistency, maintainability, and Nielsen compliance.
