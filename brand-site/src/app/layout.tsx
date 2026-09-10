@@ -1,39 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 
 import { AppShell } from "@/components/layout/app-shell";
-import { ThemeProvider } from "@/components/theme/theme-provider";
 
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   title: {
-    default: "Brand — Find trusted local services",
-    template: "%s | Brand",
+    default: "Fechô — Achou, conversou, fechô",
+    template: "%s | Fechô",
   },
   description:
-    "Search service categories, browse top-rated professionals, and book with confidence.",
+    "Encontre profissionais de confiança perto de você, converse e agende seu serviço.",
   openGraph: {
-    title: "Brand — Find trusted local services",
+    title: "Fechô — Achou, conversou, fechô",
     description:
-      "Search service categories, browse top-rated professionals, and book with confidence.",
+      "Encontre profissionais de confiança perto de você, converse e agende seu serviço.",
     type: "website",
     locale: "en_US",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0f172a",
+  themeColor: "#f7f8f3",
   width: "device-width",
   initialScale: 1,
 };
@@ -44,19 +32,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
-      >
+    <html lang="pt-BR">
+      <body className="font-sans antialiased">
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring"
         >
-          Skip to main content
+          Ir para o conteúdo
         </a>
-        <ThemeProvider>
-          <AppShell>{children}</AppShell>
-        </ThemeProvider>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

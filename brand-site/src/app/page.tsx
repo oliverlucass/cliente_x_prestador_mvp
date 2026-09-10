@@ -1,11 +1,5 @@
-import { SearchSection } from "@/components/marketing/search-section";
-import { ServicesSection } from "@/components/marketing/services-section";
+import { MarketplaceHome } from "@/components/marketplace/marketplace-home";
 
 export default function HomePage() {
-  return (
-    <>
-      <SearchSection />
-      <ServicesSection />
-    </>
-  );
+  return <MarketplaceHome />;
 }
