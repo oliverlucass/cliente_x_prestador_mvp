@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { ProviderReviews } from "@/components/services/provider-reviews";
+import { ServiceNegotiation } from "@/components/services/service-negotiation";
 import type { Service } from "@/types/service";
 
 interface ServiceDetailProps {
@@ -80,7 +82,8 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
             </button>
             {galleryImages.slice(1).map((image, index) => <button key={image} type="button" onClick={() => setActiveGalleryImage(index + 1)} className="relative min-h-0 overflow-hidden" aria-label={`Ver foto ${index + 2}`}><Image src={image} alt={`Foto do serviço de ${service.profession}`} fill sizes="(max-width: 768px) 50vw, 20vw" className="object-cover transition hover:scale-105" />{index === 3 && <span className="absolute bottom-3 right-3 rounded-md bg-white px-3 py-2 text-xs font-semibold shadow-sm">Ver todas as fotos</span>}</button>)}
           </div>
-          <div className="px-5 pb-32 pt-6 sm:px-8">
+          <div className="gap-5 bg-[#f7f9f4] p-4 sm:p-5 md:grid md:grid-cols-[3fr_2fr] md:items-start">
+          <div className="min-w-0 rounded-lg border bg-white px-5 pb-8 pt-6 shadow-sm sm:px-8">
             <div className="flex items-start justify-between gap-5"><div><p className="text-sm font-semibold text-[#527637]">{service.category}</p><h2 className="mt-1 text-2xl font-bold leading-tight">{service.title}</h2></div><span className="flex shrink-0 items-center gap-1 pt-1 text-sm font-semibold"><Star className="h-4 w-4 fill-foreground" /> {service.rating.toFixed(2).replace(".", ",")}</span></div>
             <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin className="h-4 w-4" /> {service.neighborhood}, {service.city} · {service.distance.toFixed(1).replace(".", ",")} km</p>
 
@@ -89,6 +92,7 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
             {chatOpen && <ChatPreview provider={service.provider} />}
             <p className="leading-7 text-muted-foreground">{service.description}</p>
             <div className="mt-4 flex flex-wrap gap-2">{service.tags.map((tag) => <span key={tag} className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">{tag}</span>)}</div>
+            <ProviderReviews service={service} />
 
             <div className="mt-6 rounded-lg border bg-white p-4"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase text-muted-foreground">Preço publicado</p><p className="mt-1 text-xl font-bold">{service.priceLabel}</p><p className="mt-1 text-xs text-muted-foreground">{service.priceDetail}</p></div><span className="rounded-md bg-[#eef8c9] px-2.5 py-1 text-xs font-semibold">Referência</span></div><p className="mt-3 border-t pt-3 text-xs leading-5 text-muted-foreground">Materiais ou mudanças no escopo são combinados no chat antes da confirmação.</p></div>
 
@@ -101,7 +105,8 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
             <label className="mt-7 block"><span className="text-sm font-bold">Conte um pouco sobre o serviço</span><textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={3} placeholder="Ex.: preciso pintar uma parede de 3 metros..." className="mt-2 w-full resize-none rounded-md border bg-white p-3 text-sm leading-6 outline-none focus:border-foreground" /><span className="mt-1 block text-xs text-muted-foreground">O profissional verá essa mensagem antes de aceitar.</span></label>
             <div className="mt-6 flex gap-3 rounded-lg bg-[#edf7ef] p-4"><ShieldCheck className="h-5 w-5 shrink-0 text-[#277246]" /><div><p className="text-sm font-semibold">Primeiro vocês combinam</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Enviar a solicitação não confirma nem cobra o serviço. {service.provider} revisa os detalhes e aceita o horário.</p></div></div>
           </div>
-          <div className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t bg-white/95 px-5 pt-3 backdrop-blur md:left-auto md:w-[70vw] md:px-8"><div className="flex items-center gap-4"><div className="min-w-[126px]"><p className="text-xs text-muted-foreground">Preço do anúncio</p><p className="text-base font-bold">{service.priceLabel}</p></div><button type="button" onClick={() => setStage("requested")} className="h-14 flex-1 rounded-md bg-foreground px-5 font-semibold text-background transition hover:opacity-90">Enviar solicitação</button></div></div>
+          <ServiceNegotiation service={service} />
+          </div>
         </>}
 
         {stage === "requested" && <div className="px-5 py-7 sm:px-8">

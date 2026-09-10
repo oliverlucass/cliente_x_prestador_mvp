@@ -21,5 +21,6 @@ export interface Service {
   imageAlt: string;
   providerImageUrl: string;
   availableToday?: boolean;
+  availableWeekend?: boolean;
   tags: string[];
 }

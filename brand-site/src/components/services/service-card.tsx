@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Heart, MapPin, Star, Zap } from "lucide-react";
+import { BadgeCheck, Heart, MapPin, Star, Zap } from "lucide-react";
 
 import type { Service } from "@/types/service";
 import { cn } from "@/lib/utils";
@@ -36,6 +36,7 @@ export function ServiceCard({ service, saved, onSave, onOpen, className }: Servi
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-muted-foreground">{service.category} · {service.distance.toFixed(1).replace(".", ",")} km</p>
+            <p className="mt-1 flex items-center gap-1 text-xs font-medium text-[#327054]"><BadgeCheck className="h-3.5 w-3.5" /> {service.verified ? "Prestador verificado" : "Novo prestador"} · {service.completedJobs} serviços</p>
             <h3 className="mt-1 truncate text-[17px] font-semibold leading-5 text-foreground">{service.title}</h3>
           </div>
           <span className="flex shrink-0 items-center gap-1 text-sm font-semibold"><Star className="h-4 w-4 fill-foreground" /> {service.rating.toFixed(2).replace(".", ",")}</span>

@@ -3,7 +3,7 @@
 import type { LucideIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
-  Bell, BriefcaseBusiness, CheckCircle2, ChevronDown, CircleUserRound,
+  ArrowDownUp, Bell, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, CircleUserRound,
   Compass, Drill, Flower2, Heart, House, LayoutGrid, ListFilter,
   LocateFixed, Map as MapIcon, MapPin, MessageCircle, Navigation,
   PaintRoller, PawPrint, Search, SlidersHorizontal, SprayCan,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { BrandLogo, BrandMark } from "@/components/brand/brand-logo";
+import { AccountMenu } from "@/components/account/account-menu";
 import { ServiceCard } from "@/components/services/service-card";
 import { ServiceDetail } from "@/components/services/service-detail";
 import { categories, services } from "@/data/mock/services";
@@ -30,6 +31,8 @@ const categoryIcons: Record<string, LucideIcon> = {
 
 const quickSearches = ["Pintor", "Eletricista", "Montador", "Diarista"];
 const neighborhoods = ["Vila Mariana, São Paulo", "Moema, São Paulo", "Pinheiros, São Paulo", "Tatuapé, São Paulo"];
+type DateFilter = "any" | "today" | "weekend";
+type SortMode = "default" | "distance" | "price" | "rating";
 
 export function MarketplaceHome() {
   const [query, setQuery] = useState("");
@@ -37,19 +40,31 @@ export function MarketplaceHome() {
   const [locationOpen, setLocationOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [todayOnly, setTodayOnly] = useState(false);
+  const [dateFilter, setDateFilter] = useState<DateFilter>("any");
+  const [sortMode, setSortMode] = useState<SortMode>("default");
   const [showFilters, setShowFilters] = useState(false);
   const [radius, setRadius] = useState(6);
   const [view, setView] = useState<"list" | "map">("list");
   const [saved, setSaved] = useState<string[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
-  const filtered = useMemo(() => services.filter((service) => {
+  const filtered = useMemo(() => {
+    const result = services.filter((service) => {
     const term = query.trim().toLocaleLowerCase("pt-BR");
     const matchesQuery = !term || [service.title, service.provider, service.profession, service.category, ...service.tags]
       .some((value) => value.toLocaleLowerCase("pt-BR").includes(term));
     const matchesCategory = activeCategory === "Todos" || service.category === activeCategory;
-    return matchesQuery && matchesCategory && service.distance <= radius && (!todayOnly || service.availableToday);
-  }), [query, activeCategory, radius, todayOnly]);
+    const matchesDate = dateFilter === "any" || (dateFilter === "today" ? service.availableToday : service.availableWeekend);
+    return matchesQuery && matchesCategory && service.distance <= radius && matchesDate && (!todayOnly || service.availableToday);
+    });
+
+    return result.sort((first, second) => {
+      if (sortMode === "distance") return first.distance - second.distance;
+      if (sortMode === "price") return first.price - second.price;
+      if (sortMode === "rating") return second.rating - first.rating;
+      return 0;
+    });
+  }, [query, activeCategory, radius, todayOnly, dateFilter, sortMode]);
 
   const toggleSave = (id: string) => setSaved((current) => current.includes(id)
     ? current.filter((item) => item !== id)
@@ -70,7 +85,7 @@ export function MarketplaceHome() {
             <button type="button" className="rounded-md border border-foreground bg-foreground px-4 py-2 text-sm font-semibold text-background hover:opacity-90">Anunciar serviço</button>
           </nav>
           <button type="button" className="relative ml-auto grid h-10 w-10 place-items-center rounded-full hover:bg-muted lg:ml-0" aria-label="Notificações"><Bell className="h-5 w-5" /><span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#a7ce32] ring-2 ring-background" /></button>
-          <button type="button" className="hidden h-10 items-center gap-2 rounded-full border bg-white px-2 pr-3 text-sm font-semibold sm:flex"><CircleUserRound className="h-6 w-6" /> Entrar</button>
+          <AccountMenu />
         </div>
       </header>
 
@@ -114,13 +129,17 @@ export function MarketplaceHome() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div><p className="text-xs font-bold uppercase text-[#527637]">Anúncios perto de {location.split(",")[0]}</p><h2 className="mt-1 text-2xl font-black sm:text-3xl">Escolha quem combina com você</h2><p className="mt-1 text-sm text-muted-foreground">{filtered.length} profissionais num raio de até {radius} km</p></div>
           <div className="flex gap-2">
-            <button type="button" onClick={() => setTodayOnly((value) => !value)} className={cn("flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold", todayOnly ? "border-foreground bg-foreground text-background" : "bg-white")}><CheckCircle2 className="h-4 w-4" /> Hoje</button>
+            <button type="button" onClick={() => { setTodayOnly((value) => !value); setDateFilter((value) => value === "today" ? "any" : "today"); }} className={cn("flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold", todayOnly || dateFilter === "today" ? "border-foreground bg-foreground text-background" : "bg-white")}><CheckCircle2 className="h-4 w-4" /> Hoje</button>
             <button type="button" onClick={() => setShowFilters((value) => !value)} className={cn("flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold", showFilters ? "border-foreground bg-muted" : "bg-white")}><SlidersHorizontal className="h-4 w-4" /> <span className="hidden sm:inline">Filtros</span></button>
             <div className="flex rounded-md border bg-white p-1"><button type="button" onClick={() => setView("list")} className={cn("grid h-8 w-8 place-items-center rounded-sm", view === "list" && "bg-foreground text-background")} aria-label="Ver anúncios"><ListFilter className="h-4 w-4" /></button><button type="button" onClick={() => setView("map")} className={cn("grid h-8 w-8 place-items-center rounded-sm", view === "map" && "bg-foreground text-background")} aria-label="Ver mapa"><MapIcon className="h-4 w-4" /></button></div>
           </div>
         </div>
 
-        {showFilters && <div className="mt-5 flex flex-wrap items-center gap-3 border-y bg-white py-4"><span className="text-sm font-semibold">Distância:</span>{[3, 6, 10].map((value) => <button key={value} type="button" onClick={() => setRadius(value)} className={cn("h-9 rounded-full border px-4 text-sm", radius === value && "border-foreground bg-foreground text-white")}>Até {value} km</button>)}<span className="hidden h-6 w-px bg-border sm:block" /><span className="text-sm text-muted-foreground">Os preços publicados são definidos por cada profissional.</span></div>}
+        <div className="scrollbar-hide mt-5 flex gap-2 overflow-x-auto pb-1">
+          {[{ label: "Qualquer dia", value: "any" as DateFilter, icon: CalendarDays }, { label: "Hoje", value: "today" as DateFilter, icon: CheckCircle2 }, { label: "Neste fim de semana", value: "weekend" as DateFilter, icon: CalendarDays }, { label: "Mais perto", value: "distance" as SortMode, icon: MapPin }, { label: "Menor preço", value: "price" as SortMode, icon: ArrowDownUp }, { label: "Melhor avaliados", value: "rating" as SortMode, icon: CheckCircle2 }].map((item) => { const Icon = item.icon; const active = ["any", "today", "weekend"].includes(item.value) ? dateFilter === item.value : sortMode === item.value; return <button key={item.label} type="button" onClick={() => { if (["any", "today", "weekend"].includes(item.value)) { setDateFilter(item.value as DateFilter); setTodayOnly(item.value === "today"); } else setSortMode(item.value as SortMode); }} className={cn("flex h-9 shrink-0 items-center gap-1.5 rounded-full border bg-white px-3 text-xs font-semibold", active && "border-foreground bg-foreground text-white")}><Icon className="h-3.5 w-3.5" /> {item.label}</button>; })}
+        </div>
+
+        {showFilters && <div className="mt-4 flex flex-wrap items-center gap-3 border-y bg-white py-4"><span className="text-sm font-semibold">Distância:</span>{[3, 6, 10].map((value) => <button key={value} type="button" onClick={() => setRadius(value)} className={cn("h-9 rounded-full border px-4 text-sm", radius === value && "border-foreground bg-foreground text-white")}>Até {value} km</button>)}<span className="hidden h-6 w-px bg-border sm:block" /><span className="text-sm text-muted-foreground">Os preços publicados são definidos por cada profissional.</span></div>}
 
         {view === "list" ? (
           filtered.length ? <div className="mt-7 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{filtered.map((service) => <ServiceCard key={service.id} service={service} saved={saved.includes(service.id)} onSave={() => toggleSave(service.id)} onOpen={() => setSelectedService(service)} />)}</div> : <div className="mt-10 border-y py-16 text-center"><Search className="mx-auto h-8 w-8 text-muted-foreground" /><h3 className="mt-3 text-lg font-bold">Nada por aqui ainda</h3><p className="mt-1 text-sm text-muted-foreground">Tente aumentar a distância ou buscar outro serviço.</p></div>
@@ -132,6 +151,13 @@ export function MarketplaceHome() {
             <button type="button" onClick={() => setLocationOpen(true)} className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-white px-4 py-2.5 text-sm font-semibold shadow-lg"><Navigation className="h-4 w-4" /> Alterar região</button>
           </div>
         )}
+      </section>
+
+      <section className="border-y bg-white">
+        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-10">
+          <div><p className="text-xs font-bold uppercase text-[#527637]">Sua atividade</p><p className="mt-1 text-sm font-semibold">Continue de onde parou</p><p className="mt-1 text-xs text-muted-foreground">Você ainda não tem pedidos recentes.</p></div>
+          <div className="flex items-center gap-2"><button type="button" onClick={() => setSelectedService(services[0])} className="rounded-md border px-3 py-2 text-xs font-semibold hover:bg-muted">Ver serviço recente</button><button type="button" onClick={() => setSaved((current) => current.length ? current : [services[0].id])} className="rounded-md bg-foreground px-3 py-2 text-xs font-semibold text-white">{saved.length ? `${saved.length} salvo${saved.length > 1 ? "s" : ""}` : "Salvar um anúncio"}</button></div>
+        </div>
       </section>
 
       <section className="mt-5 border-y bg-[#e6eee7] text-foreground">
