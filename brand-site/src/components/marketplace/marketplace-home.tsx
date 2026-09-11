@@ -12,6 +12,7 @@ import {
 
 import { BrandLogo, BrandMark } from "@/components/brand/brand-logo";
 import { AccountMenu } from "@/components/account/account-menu";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { ServiceCard } from "@/components/services/service-card";
 import { ServiceDetail } from "@/components/services/service-detail";
 import { categories, services } from "@/data/mock/services";
@@ -167,7 +168,7 @@ export function MarketplaceHome() {
         </div>
       </section>
 
-      <footer className="bg-white px-4 py-7 text-center text-xs text-muted-foreground"><p><strong className="brand-wordmark mr-1 text-sm text-foreground">fechô</strong> Marketplace local de serviços · Conceito 2026</p></footer>
+      <SiteFooter />
 
       <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-white/95 px-1 pt-2 backdrop-blur md:hidden" aria-label="Navegação principal">{[{ icon: House, label: "Início" }, { icon: Compass, label: "Explorar" }, { icon: Wrench, label: "Pedidos" }, { icon: Heart, label: "Salvos" }, { icon: CircleUserRound, label: "Perfil" }].map((item, index) => <button key={item.label} type="button" className={cn("flex min-w-0 flex-col items-center gap-1 text-[10px] font-medium", index === 0 ? "text-foreground" : "text-muted-foreground")}><item.icon className={cn("h-5 w-5", index === 0 && "fill-[#c9f24a]")} />{item.label}</button>)}</nav>
 
