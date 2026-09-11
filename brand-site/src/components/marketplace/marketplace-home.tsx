@@ -12,6 +12,7 @@ import {
 
 import { BrandLogo, BrandMark } from "@/components/brand/brand-logo";
 import { AccountMenu } from "@/components/account/account-menu";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { ServiceCard } from "@/components/services/service-card";
 import { ServiceDetail } from "@/components/services/service-detail";
 import { categories, services } from "@/data/mock/services";
@@ -129,17 +130,14 @@ export function MarketplaceHome() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div><p className="text-xs font-bold uppercase text-[#527637]">Anúncios perto de {location.split(",")[0]}</p><h2 className="mt-1 text-2xl font-black sm:text-3xl">Escolha quem combina com você</h2><p className="mt-1 text-sm text-muted-foreground">{filtered.length} profissionais num raio de até {radius} km</p></div>
           <div className="flex gap-2">
-            <button type="button" onClick={() => { setTodayOnly((value) => !value); setDateFilter((value) => value === "today" ? "any" : "today"); }} className={cn("flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold", todayOnly || dateFilter === "today" ? "border-foreground bg-foreground text-background" : "bg-white")}><CheckCircle2 className="h-4 w-4" /> Hoje</button>
             <button type="button" onClick={() => setShowFilters((value) => !value)} className={cn("flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold", showFilters ? "border-foreground bg-muted" : "bg-white")}><SlidersHorizontal className="h-4 w-4" /> <span className="hidden sm:inline">Filtros</span></button>
             <div className="flex rounded-md border bg-white p-1"><button type="button" onClick={() => setView("list")} className={cn("grid h-8 w-8 place-items-center rounded-sm", view === "list" && "bg-foreground text-background")} aria-label="Ver anúncios"><ListFilter className="h-4 w-4" /></button><button type="button" onClick={() => setView("map")} className={cn("grid h-8 w-8 place-items-center rounded-sm", view === "map" && "bg-foreground text-background")} aria-label="Ver mapa"><MapIcon className="h-4 w-4" /></button></div>
           </div>
         </div>
 
-        <div className="scrollbar-hide mt-5 flex gap-2 overflow-x-auto pb-1">
+        {showFilters && <div className="mt-4 flex flex-wrap items-center gap-3 border-y bg-white py-4"><span className="text-sm font-semibold">Distância:</span>{[3, 6, 10].map((value) => <button key={value} type="button" onClick={() => setRadius(value)} className={cn("h-9 rounded-full border px-4 text-sm", radius === value && "border-foreground bg-foreground text-white")}>Até {value} km</button>)}<span className="hidden h-6 w-px bg-border sm:block" /><span className="text-sm text-muted-foreground">Os preços publicados são definidos por cada profissional.</span><div className="scrollbar-hide mt-5 flex gap-2 overflow-x-auto pb-1">
           {[{ label: "Qualquer dia", value: "any" as DateFilter, icon: CalendarDays }, { label: "Hoje", value: "today" as DateFilter, icon: CheckCircle2 }, { label: "Neste fim de semana", value: "weekend" as DateFilter, icon: CalendarDays }, { label: "Mais perto", value: "distance" as SortMode, icon: MapPin }, { label: "Menor preço", value: "price" as SortMode, icon: ArrowDownUp }, { label: "Melhor avaliados", value: "rating" as SortMode, icon: CheckCircle2 }].map((item) => { const Icon = item.icon; const active = ["any", "today", "weekend"].includes(item.value) ? dateFilter === item.value : sortMode === item.value; return <button key={item.label} type="button" onClick={() => { if (["any", "today", "weekend"].includes(item.value)) { setDateFilter(item.value as DateFilter); setTodayOnly(item.value === "today"); } else setSortMode(item.value as SortMode); }} className={cn("flex h-9 shrink-0 items-center gap-1.5 rounded-full border bg-white px-3 text-xs font-semibold", active && "border-foreground bg-foreground text-white")}><Icon className="h-3.5 w-3.5" /> {item.label}</button>; })}
-        </div>
-
-        {showFilters && <div className="mt-4 flex flex-wrap items-center gap-3 border-y bg-white py-4"><span className="text-sm font-semibold">Distância:</span>{[3, 6, 10].map((value) => <button key={value} type="button" onClick={() => setRadius(value)} className={cn("h-9 rounded-full border px-4 text-sm", radius === value && "border-foreground bg-foreground text-white")}>Até {value} km</button>)}<span className="hidden h-6 w-px bg-border sm:block" /><span className="text-sm text-muted-foreground">Os preços publicados são definidos por cada profissional.</span></div>}
+        </div></div>}
 
         {view === "list" ? (
           filtered.length ? <div className="mt-7 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{filtered.map((service) => <ServiceCard key={service.id} service={service} saved={saved.includes(service.id)} onSave={() => toggleSave(service.id)} onOpen={() => setSelectedService(service)} />)}</div> : <div className="mt-10 border-y py-16 text-center"><Search className="mx-auto h-8 w-8 text-muted-foreground" /><h3 className="mt-3 text-lg font-bold">Nada por aqui ainda</h3><p className="mt-1 text-sm text-muted-foreground">Tente aumentar a distância ou buscar outro serviço.</p></div>
@@ -153,13 +151,6 @@ export function MarketplaceHome() {
         )}
       </section>
 
-      <section className="border-y bg-white">
-        <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-10">
-          <div><p className="text-xs font-bold uppercase text-[#527637]">Sua atividade</p><p className="mt-1 text-sm font-semibold">Continue de onde parou</p><p className="mt-1 text-xs text-muted-foreground">Você ainda não tem pedidos recentes.</p></div>
-          <div className="flex items-center gap-2"><button type="button" onClick={() => setSelectedService(services[0])} className="rounded-md border px-3 py-2 text-xs font-semibold hover:bg-muted">Ver serviço recente</button><button type="button" onClick={() => setSaved((current) => current.length ? current : [services[0].id])} className="rounded-md bg-foreground px-3 py-2 text-xs font-semibold text-white">{saved.length ? `${saved.length} salvo${saved.length > 1 ? "s" : ""}` : "Salvar um anúncio"}</button></div>
-        </div>
-      </section>
-
       <section className="mt-5 border-y bg-[#e6eee7] text-foreground">
         <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-12 sm:px-6 md:grid-cols-[1fr_1.6fr] md:items-center md:py-16 lg:px-10">
           <div><p className="text-xs font-bold uppercase">Tem um talento?</p><h2 className="mt-2 text-3xl font-black">Transforme seu tempo livre em renda.</h2><p className="mt-3 max-w-md text-sm leading-6 text-foreground/70">Publique seu anúncio, escolha como cobrar e abra apenas os horários em que quiser trabalhar.</p><button type="button" className="mt-6 rounded-md bg-foreground px-5 py-3 text-sm font-bold text-white">Criar meu anúncio</button></div>
@@ -167,7 +158,7 @@ export function MarketplaceHome() {
         </div>
       </section>
 
-      <footer className="bg-white px-4 py-7 text-center text-xs text-muted-foreground"><p><strong className="brand-wordmark mr-1 text-sm text-foreground">fechô</strong> Marketplace local de serviços · Conceito 2026</p></footer>
+      <SiteFooter />
 
       <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-white/95 px-1 pt-2 backdrop-blur md:hidden" aria-label="Navegação principal">{[{ icon: House, label: "Início" }, { icon: Compass, label: "Explorar" }, { icon: Wrench, label: "Pedidos" }, { icon: Heart, label: "Salvos" }, { icon: CircleUserRound, label: "Perfil" }].map((item, index) => <button key={item.label} type="button" className={cn("flex min-w-0 flex-col items-center gap-1 text-[10px] font-medium", index === 0 ? "text-foreground" : "text-muted-foreground")}><item.icon className={cn("h-5 w-5", index === 0 && "fill-[#c9f24a]")} />{item.label}</button>)}</nav>
 
