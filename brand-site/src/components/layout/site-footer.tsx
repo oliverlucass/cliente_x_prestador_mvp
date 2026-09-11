@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { Separator } from "@/components/ui/separator";
 
@@ -43,9 +41,9 @@ export function SiteFooter() {
             <ul className="space-y-3">
               {institutionalLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className={linkClassName}>
+                  <a href={link.href} className={linkClassName}>
                     {link.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -58,9 +56,9 @@ export function SiteFooter() {
             <ul className="space-y-3">
               {usefulLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className={linkClassName}>
+                  <a href={link.href} className={linkClassName}>
                     {link.label}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
