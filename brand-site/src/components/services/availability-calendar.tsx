@@ -75,7 +75,7 @@ export function AvailabilityCalendar({ availableDates, className }: Availability
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
-        <p className="text-sm font-medium capitalize text-foreground">{monthLabel}</p>
+        <p className="text-sm font-medium text-foreground">{monthLabel}</p>
         <button
           type="button"
           onClick={() => setVisibleMonth((current) => new Date(current.getFullYear(), current.getMonth() + 1, 1))}
