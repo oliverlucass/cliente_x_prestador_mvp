@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 60 20% 97%;
+    --foreground: 166 52% 14%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 166 52% 14%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 160 84% 39%;
-    --accent-foreground: 0 0% 100%;
+    --primary: 166 52% 14%;
+    --primary-foreground: 72 24% 97%;
+    --secondary: 70 18% 91%;
+    --secondary-foreground: 166 52% 14%;
+    --muted: 70 18% 93%;
+    --muted-foreground: 157 9% 42%;
+    --accent: 83 78% 49%;
+    --accent-foreground: 164 45% 9%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 160 84% 39%;
-    --radius: 0.75rem;
+    --border: 72 13% 86%;
+    --input: 72 13% 84%;
+    --ring: 83 78% 42%;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -54,6 +54,20 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    overflow-x: hidden;
+  }
+
+  .brand-wordmark {
+    font-family: "Arial Rounded MT Bold", "Avenir Next", "Trebuchet MS", sans-serif;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1;
+  }
+
+  .brand-terminal-o {
+    color: inherit;
+    font-size: 1.08em;
+    font-weight: 900;
   }
 
   html {
@@ -80,13 +94,7 @@
     text-wrap: balance;
   }
 
-  .gradient-accent {
-    background: linear-gradient(
-      135deg,
-      hsl(160 84% 39%) 0%,
-      hsl(172 66% 40%) 100%
-    );
-  }
+  .gradient-accent { background: hsl(var(--accent)); }
 
   .gradient-hero {
     background: linear-gradient(
@@ -105,4 +113,6 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  .safe-bottom { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
 }

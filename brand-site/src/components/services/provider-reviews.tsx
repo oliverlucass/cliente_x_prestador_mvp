@@ -1,0 +1,47 @@
+import Image from "next/image";
+import { BadgeCheck, CheckCircle2, CircleDollarSign, MessageCircle, Star } from "lucide-react";
+
+import type { Service } from "@/types/service";
+
+const reviewCopy = [
+  { name: "Marina", area: "Vila Mariana", avatar: "/images/ana.jpg", text: "Muito cuidadoso, explicou tudo antes de começar e entregou o serviço no horário combinado." },
+  { name: "Rafael", area: "Aclimação", avatar: "/images/rafael.jpg", text: "Ótima comunicação e trabalho muito bem feito. Já salvei o contato para chamar de novo." },
+  { name: "Camila", area: "Saúde", avatar: "/images/luciana.jpg", text: "Pontual, organizado e super tranquilo para combinar os detalhes pelo chat." },
+  { name: "Bruno", area: "Moema", avatar: "/images/marcos.jpg", text: "Preço justo e resultado conforme o anúncio. Recomendo bastante." },
+];
+
+export function ProviderReviews({ service }: { service: Service }) {
+  const categories = [
+    { label: "Qualidade", value: Math.max(4.6, service.rating - 0.03).toFixed(1), icon: CheckCircle2 },
+    { label: "Comunicação", value: Math.min(5, service.rating + 0.02).toFixed(1), icon: MessageCircle },
+    { label: "Pontualidade", value: Math.max(4.6, service.rating - 0.05).toFixed(1), icon: BadgeCheck },
+    { label: "Custo-benefício", value: Math.max(4.5, service.rating - 0.08).toFixed(1), icon: CircleDollarSign },
+  ];
+
+  return (
+    <section className="mt-9 border-t pt-7" aria-labelledby="reviews-title">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 id="reviews-title" className="flex items-center gap-2 text-xl font-bold"><Star className="h-5 w-5 fill-foreground" /> {service.rating.toFixed(1).replace(".", ",")} · {service.reviewCount} avaliações</h3>
+          <p className="mt-1 text-xs text-muted-foreground">Avaliações de clientes que contrataram este prestador.</p>
+        </div>
+        {service.verified && <span className="flex shrink-0 items-center gap-1 rounded-full bg-[#edf7ef] px-2.5 py-1 text-xs font-semibold text-[#277246]"><BadgeCheck className="h-3.5 w-3.5" /> Verificado</span>}
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {categories.map(({ label, value, icon: Icon }) => <div key={label} className="rounded-md border bg-white p-3"><p className="truncate text-xs font-medium text-muted-foreground">{label}</p><p className="mt-1 flex items-center gap-1 text-lg font-bold">{value} <Icon className="h-4 w-4 text-[#527637]" /></p></div>)}
+      </div>
+
+      <div className="mt-6 rounded-md bg-muted/60 p-4">
+        <p className="text-sm font-bold">O que os clientes destacam</p>
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          {["Muito cuidadoso", "Boa comunicação", "Pontual", "Preço justo"].map((highlight) => <span key={highlight} className="shrink-0 rounded-full bg-white px-3 py-2 text-xs font-semibold shadow-sm">{highlight}</span>)}
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-x-8 gap-y-7 sm:grid-cols-2">
+        {reviewCopy.slice(0, 4).map((review) => <article key={review.name} className="min-w-0"><div className="flex items-center gap-3"><div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={review.avatar} alt={`Foto de ${review.name}`} fill sizes="40px" className="object-cover" /></div><div className="min-w-0"><p className="truncate text-sm font-semibold">{review.name}</p><p className="text-xs text-muted-foreground">{review.area} · cliente Fechô</p></div></div><p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground"><span className="flex">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="h-3 w-3 fill-foreground text-foreground" />)}</span> · há {review.name === "Marina" ? "2 dias" : "3 semanas"}</p><p className="mt-2 text-sm leading-6 text-foreground/80">{review.text}</p></article>)}
+      </div>
+    </section>
+  );
+}
