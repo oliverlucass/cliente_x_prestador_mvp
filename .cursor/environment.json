@@ -1,0 +1,17 @@
+{
+  "install": "cd brand-site && npm ci",
+  "start": "true",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "cd brand-site && npm run dev",
+      "description": "Next.js dev server on port 3000"
+    }
+  ],
+  "ports": [
+    {
+      "name": "web",
+      "port": 3000
+    }
+  ]
+}
