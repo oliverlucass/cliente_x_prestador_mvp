@@ -22,7 +22,7 @@ interface ServiceDetailProps {
 }
 
 type Stage = "booking" | "requested" | "provider" | "confirmed";
-const times = ["08:00", "10:30", "14:00", "16:30"];
+const selectedTime = "A combinar";
 const galleryPool = [
   "/images/eletrica.jpg",
   "/images/hidraulica.jpg",
@@ -53,7 +53,6 @@ function getInitialAvailableDate() {
 export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetailProps) {
   const [stage, setStage] = useState<Stage>("booking");
   const [selectedDate, setSelectedDate] = useState(getInitialAvailableDate);
-  const [selectedTime, setSelectedTime] = useState("10:30");
   const [message, setMessage] = useState("Preciso instalar duas luminárias na sala.");
   const [chatOpen, setChatOpen] = useState(false);
   const [calendarAdded, setCalendarAdded] = useState(false);
@@ -100,7 +99,6 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
             <div className="mt-8">
               <h3 className="text-lg font-bold">Quando você precisa?</h3>
               <AvailabilityCalendar value={selectedDate} onChange={setSelectedDate} />
-              <div className="mt-3 grid grid-cols-4 gap-2">{times.map((time) => <button key={time} type="button" onClick={() => setSelectedTime(time)} className={cn("h-10 rounded-md border text-sm font-medium transition", selectedTime === time ? "border-[#a3c82f] bg-[#e9f8b5]" : "bg-white hover:border-foreground")}>{time}</button>)}</div>
             </div>
 
             <label className="mt-7 block"><span className="text-sm font-bold">Conte um pouco sobre o serviço</span><textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={3} placeholder="Ex.: preciso pintar uma parede de 3 metros..." className="mt-2 w-full resize-none rounded-md border bg-white p-3 text-sm leading-6 outline-none focus:border-foreground" /><span className="mt-1 block text-xs text-muted-foreground">O profissional verá essa mensagem antes de aceitar.</span></label>

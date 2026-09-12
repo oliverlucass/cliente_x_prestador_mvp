@@ -42,13 +42,18 @@ export function AvailabilityCalendar({ value, onChange }: AvailabilityCalendarPr
       0,
     ).getDate();
 
-    return [
+    const days = [
       ...Array.from({ length: firstWeekDay }, () => null),
       ...Array.from(
         { length: daysInMonth },
         (_, index) =>
           new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), index + 1),
       ),
+    ];
+
+    return [
+      ...days,
+      ...Array.from({ length: 42 - days.length }, () => null),
     ];
   }, [visibleMonth]);
 
@@ -87,7 +92,7 @@ export function AvailabilityCalendar({ value, onChange }: AvailabilityCalendarPr
         </button>
       </div>
 
-      <div className="mt-2 grid grid-cols-7 text-center">
+      <div className="mt-2 grid grid-cols-7 grid-rows-[repeat(7,2.25rem)] text-center">
         {weekDays.map((day) => (
           <span key={day} className="py-1 text-[11px] font-medium text-muted-foreground">
             {day}
