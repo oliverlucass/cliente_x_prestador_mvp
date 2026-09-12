@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ArrowRight, BadgeCheck, CalendarCheck, CalendarDays, Check, CheckCircle2,
   ChevronLeft, Clock3, Heart, MapPin, MessageCircle, Send, ShieldCheck,
@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { AvailabilityCalendar } from "@/components/services/availability-calendar";
 import { ProviderReviews } from "@/components/services/provider-reviews";
 import { ServiceNegotiation } from "@/components/services/service-negotiation";
 import type { Service } from "@/types/service";
@@ -36,12 +37,23 @@ function formatFullDate(value: string) {
   return new Date(`${value}T12:00:00`).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" });
 }
 
+function getInitialAvailableDate() {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  while (date.getDay() === 0 || date.getDay() === 6) {
+    date.setDate(date.getDate() + 1);
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetailProps) {
   const [stage, setStage] = useState<Stage>("booking");
-  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedDate, setSelectedDate] = useState(getInitialAvailableDate);
   const [selectedTime, setSelectedTime] = useState("10:30");
-  const [customDate, setCustomDate] = useState("");
-  const [calendarOpen, setCalendarOpen] = useState(false);
   const [message, setMessage] = useState("Preciso instalar duas luminárias na sala.");
   const [chatOpen, setChatOpen] = useState(false);
   const [calendarAdded, setCalendarAdded] = useState(false);
@@ -49,19 +61,8 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
   const [counterOffer, setCounterOffer] = useState(false);
   const [activeGalleryImage, setActiveGalleryImage] = useState(0);
 
-  const days = useMemo(() => Array.from({ length: 5 }, (_, index) => {
-    const date = new Date();
-    date.setDate(date.getDate() + index + 1);
-    return {
-      day: date.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", ""),
-      number: date.getDate(),
-      iso: date.toISOString().slice(0, 10),
-    };
-  }), []);
-
   if (!service) return null;
 
-  const selectedDate = customDate || days[selectedDay].iso;
   const selectedDateLabel = formatFullDate(selectedDate);
   const galleryImages = [service.imageUrl, ...galleryPool.filter((image) => image !== service.imageUrl)].slice(0, 5);
 
@@ -96,9 +97,9 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
 
             <div className="mt-6 rounded-lg border bg-white p-4"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase text-muted-foreground">Preço publicado</p><p className="mt-1 text-xl font-bold">{service.priceLabel}</p><p className="mt-1 text-xs text-muted-foreground">{service.priceDetail}</p></div><span className="rounded-md bg-[#eef8c9] px-2.5 py-1 text-xs font-semibold">Referência</span></div><p className="mt-3 border-t pt-3 text-xs leading-5 text-muted-foreground">Materiais ou mudanças no escopo são combinados no chat antes da confirmação.</p></div>
 
-            <div className="mt-8"><div className="flex items-center justify-between"><h3 className="text-lg font-bold">Quando você precisa?</h3><button type="button" onClick={() => setCalendarOpen((value) => !value)} className="flex items-center gap-1 text-xs font-semibold underline underline-offset-4"><CalendarDays className="h-4 w-4" /> Ver calendário</button></div>
-              <div className="mt-4 grid grid-cols-5 gap-2">{days.map((date, index) => <button key={date.iso} type="button" onClick={() => { setSelectedDay(index); setCustomDate(""); }} className={cn("flex h-[68px] flex-col items-center justify-center rounded-md border text-sm transition", !customDate && selectedDay === index ? "border-foreground bg-foreground text-background" : "bg-white hover:border-foreground")}><span className="capitalize opacity-70">{index === 0 ? "Amanhã" : date.day}</span><strong className="mt-1 text-lg leading-none">{date.number}</strong></button>)}</div>
-              {calendarOpen && <label className="mt-3 flex items-center gap-3 rounded-md border bg-white p-3"><CalendarDays className="h-5 w-5 text-muted-foreground" /><span className="text-sm font-semibold">Outra data</span><input type="date" min={days[0].iso} value={customDate} onChange={(event) => setCustomDate(event.target.value)} className="ml-auto bg-transparent text-sm outline-none" /></label>}
+            <div className="mt-8">
+              <h3 className="text-lg font-bold">Quando você precisa?</h3>
+              <AvailabilityCalendar value={selectedDate} onChange={setSelectedDate} />
               <div className="mt-3 grid grid-cols-4 gap-2">{times.map((time) => <button key={time} type="button" onClick={() => setSelectedTime(time)} className={cn("h-10 rounded-md border text-sm font-medium transition", selectedTime === time ? "border-[#a3c82f] bg-[#e9f8b5]" : "bg-white hover:border-foreground")}>{time}</button>)}</div>
             </div>
 
