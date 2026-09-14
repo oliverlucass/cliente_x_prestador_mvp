@@ -32,8 +32,7 @@ export function ServiceNegotiation({ service }: { service: Service }) {
                   className="h-11 w-full rounded-md border bg-[#fbfcf9] pl-10 pr-3 text-xl font-black text-foreground outline-none placeholder:font-normal placeholder:text-muted-foreground focus:border-foreground"
                 />
               </div>
-            ) : <p className="mt-1 text-3xl font-black text-foreground">R$ {service.price}</p>}
-            <p className="mt-1 text-sm text-muted-foreground">por hora</p>
+            ) : <p className="mt-1 text-3xl font-black text-foreground">R$ {service.price}/Hora</p>}
           </div>
           <button type="button" onClick={() => { setProposalValue(""); setEditingValue(true); }} className="mt-5 grid h-9 w-9 shrink-0 place-items-center rounded-full border bg-white text-foreground transition hover:bg-muted" aria-label="Editar valor ofertado">
             <Pencil className="h-4 w-4" />

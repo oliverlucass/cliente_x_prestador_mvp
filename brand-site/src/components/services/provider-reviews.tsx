@@ -43,7 +43,7 @@ export function ProviderReviews({ service }: { service: Service }) {
 
       <div className="mt-6 grid gap-x-8 gap-y-7 sm:grid-cols-2">
         {reviewCopy.slice(0, 4).map((review) => 
-          <article key={review.name} className="min-w-0 rounded-md border bg-white p-4">
+          <article key={review.name} className="h-[160px] min-w-0 rounded-md border bg-white p-4">
             <div className="flex items-center gap-3">
               <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
                 <Image src={review.avatar} alt={`Foto de ${review.name}`} fill sizes="40px" className="object-cover" />
@@ -57,7 +57,7 @@ export function ProviderReviews({ service }: { service: Service }) {
               </div>
             </div>
            
-            <p className="mt-2 text-sm leading-6 text-foreground/80">{review.text}</p>
+            <p className="mt-2 line-clamp-3 text-sm leading-6 text-foreground/80">{review.text}</p>
           </article>)}
       </div>
     </section>

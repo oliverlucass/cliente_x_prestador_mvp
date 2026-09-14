@@ -100,7 +100,7 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
               <AvailabilityCalendar value={selectedDate} onChange={setSelectedDate} />
             </div>
 
-            <div className="mt-6 flex gap-3 rounded-lg bg-[#edf7ef] p-4"><ShieldCheck className="h-5 w-5 shrink-0 text-[#277246]" /><div><p className="text-sm font-semibold">Primeiro vocês combinam</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Enviar a solicitação não confirma nem cobra o serviço. {service.provider} revisa os detalhes e aceita o horário.</p></div></div>
+            <div className="mt-6 flex gap-3 rounded-lg bg-[#edf7ef] py-4 pr-4"><ShieldCheck className="h-5 w-5 shrink-0 text-[#277246]" /><div><p className="text-sm font-semibold">Primeiro vocês combinam</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Enviar a solicitação não confirma nem cobra o serviço. {service.provider} revisa os detalhes e aceita o horário.</p></div></div>
           </div>
           <ServiceNegotiation service={service} />
           </div>
