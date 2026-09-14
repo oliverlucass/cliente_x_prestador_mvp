@@ -19,14 +19,10 @@ function toIsoDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-function fromIsoDate(value: string) {
-  return new Date(`${value}T12:00:00`);
-}
-
-export function AvailabilityCalendar({ value, onChange }: AvailabilityCalendarProps) {
+export function AvailabilityCalendar(_props: AvailabilityCalendarProps) {
   const [visibleMonth, setVisibleMonth] = useState(() => {
-    const selected = fromIsoDate(value);
-    return new Date(selected.getFullYear(), selected.getMonth(), 1);
+    const currentDate = new Date();
+    return new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   });
 
   const today = useMemo(() => {
@@ -62,23 +58,41 @@ export function AvailabilityCalendar({ value, onChange }: AvailabilityCalendarPr
     year: "numeric",
   });
 
+  const canGoToPreviousMonth =
+    visibleMonth.getFullYear() > today.getFullYear() ||
+    (visibleMonth.getFullYear() === today.getFullYear() &&
+      visibleMonth.getMonth() > today.getMonth());
+
   function changeMonth(offset: number) {
     setVisibleMonth(
-      (current) => new Date(current.getFullYear(), current.getMonth() + offset, 1),
+      (current) => {
+        const nextMonth = new Date(
+          current.getFullYear(),
+          current.getMonth() + offset,
+          1,
+        );
+        const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        return nextMonth < currentMonth ? current : nextMonth;
+      },
     );
   }
 
   return (
     <div className="mt-3 rounded-lg border bg-white p-3 sm:p-4">
       <div className="flex items-center justify-center gap-3">
-        <button
-          type="button"
-          onClick={() => changeMonth(-1)}
-          className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
-          aria-label="Mês anterior"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
+        {canGoToPreviousMonth ? (
+          <button
+            type="button"
+            onClick={() => changeMonth(-1)}
+            className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
+            aria-label="Mês anterior"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        ) : (
+          <span className="h-8 w-8" aria-hidden="true" />
+        )}
         <p className="min-w-36 text-center text-sm font-bold capitalize">
           {monthLabel}
         </p>
@@ -101,31 +115,27 @@ export function AvailabilityCalendar({ value, onChange }: AvailabilityCalendarPr
         {calendarDays.map((date, index) => {
           if (!date) return <span key={`empty-${index}`} aria-hidden="true" />;
 
-          const isoDate = toIsoDate(date);
           const isAvailable =
             date >= today && date.getDay() !== 0 && date.getDay() !== 6;
-          const isSelected = value === isoDate;
+          const isToday = date.getTime() === today.getTime();
 
           return (
-            <button
-              key={isoDate}
-              type="button"
-              disabled={!isAvailable}
-              onClick={() => onChange(isoDate)}
+            <span
+              key={toIsoDate(date)}
               className={cn(
-                "mx-auto grid h-9 w-9 place-items-center rounded-full text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2",
-                isAvailable && "text-foreground hover:bg-muted",
-                !isAvailable && "cursor-not-allowed text-muted-foreground/45",
-                isSelected && "bg-foreground text-background hover:bg-foreground",
+                "mx-auto grid h-9 w-9 place-items-center rounded-full text-sm font-semibold",
+                isAvailable && "text-foreground",
+                !isAvailable && "text-muted-foreground/45",
+                isToday && "bg-foreground text-background",
               )}
               aria-label={`${date.toLocaleDateString("pt-BR", {
                 day: "numeric",
                 month: "long",
               })}${isAvailable ? ", disponível" : ", indisponível"}`}
-              aria-pressed={isSelected}
+              aria-current={isToday ? "date" : undefined}
             >
               {date.getDate()}
-            </button>
+            </span>
           );
         })}
       </div>
