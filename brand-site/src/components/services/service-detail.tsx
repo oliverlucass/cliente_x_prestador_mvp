@@ -94,14 +94,11 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
             <div className="mt-4 flex flex-wrap gap-2">{service.tags.map((tag) => <span key={tag} className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">{tag}</span>)}</div>
             <ProviderReviews service={service} />
 
-            <div className="mt-6 rounded-lg border bg-white p-4"><div className="flex items-start justify-between gap-4"><div><p className="text-xs font-semibold uppercase text-muted-foreground">Preço publicado</p><p className="mt-1 text-xl font-bold">{service.priceLabel}</p><p className="mt-1 text-xs text-muted-foreground">{service.priceDetail}</p></div><span className="rounded-md bg-[#eef8c9] px-2.5 py-1 text-xs font-semibold">Referência</span></div><p className="mt-3 border-t pt-3 text-xs leading-5 text-muted-foreground">Materiais ou mudanças no escopo são combinados no chat antes da confirmação.</p></div>
-
             <div className="mt-8">
-              <h3 className="text-lg font-bold">Quando você precisa?</h3>
+              <h3 className="text-lg font-bold">Disponibilidade de {service.provider.split(" ")[0]}</h3>
               <AvailabilityCalendar value={selectedDate} onChange={setSelectedDate} />
             </div>
 
-            <label className="mt-7 block"><span className="text-sm font-bold">Conte um pouco sobre o serviço</span><textarea value={message} onChange={(event) => setMessage(event.target.value)} rows={3} placeholder="Ex.: preciso pintar uma parede de 3 metros..." className="mt-2 w-full resize-none rounded-md border bg-white p-3 text-sm leading-6 outline-none focus:border-foreground" /><span className="mt-1 block text-xs text-muted-foreground">O profissional verá essa mensagem antes de aceitar.</span></label>
             <div className="mt-6 flex gap-3 rounded-lg bg-[#edf7ef] p-4"><ShieldCheck className="h-5 w-5 shrink-0 text-[#277246]" /><div><p className="text-sm font-semibold">Primeiro vocês combinam</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Enviar a solicitação não confirma nem cobra o serviço. {service.provider} revisa os detalhes e aceita o horário.</p></div></div>
           </div>
           <ServiceNegotiation service={service} />

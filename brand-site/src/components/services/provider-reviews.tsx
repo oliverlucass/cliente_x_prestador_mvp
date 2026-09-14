@@ -19,13 +19,12 @@ export function ProviderReviews({ service }: { service: Service }) {
   ];
 
   return (
-    <section className="mt-9 border-t pt-7" aria-labelledby="reviews-title">
+    <section className="mt-9 border-y py-7" aria-labelledby="reviews-title">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 id="reviews-title" className="flex items-center gap-2 text-xl font-bold"><Star className="h-5 w-5 fill-foreground" /> {service.rating.toFixed(1).replace(".", ",")} · {service.reviewCount} avaliações</h3>
           <p className="mt-1 text-xs text-muted-foreground">Avaliações de clientes que contrataram este prestador.</p>
         </div>
-        {service.verified && <span className="flex shrink-0 items-center gap-1 rounded-full bg-[#edf7ef] px-2.5 py-1 text-xs font-semibold text-[#277246]"><BadgeCheck className="h-3.5 w-3.5" /> Verificado</span>}
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -40,7 +39,23 @@ export function ProviderReviews({ service }: { service: Service }) {
       </div>
 
       <div className="mt-6 grid gap-x-8 gap-y-7 sm:grid-cols-2">
-        {reviewCopy.slice(0, 4).map((review) => <article key={review.name} className="min-w-0"><div className="flex items-center gap-3"><div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={review.avatar} alt={`Foto de ${review.name}`} fill sizes="40px" className="object-cover" /></div><div className="min-w-0"><p className="truncate text-sm font-semibold">{review.name}</p><p className="text-xs text-muted-foreground">{review.area} · cliente Fechô</p></div></div><p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground"><span className="flex">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="h-3 w-3 fill-foreground text-foreground" />)}</span> · há {review.name === "Marina" ? "2 dias" : "3 semanas"}</p><p className="mt-2 text-sm leading-6 text-foreground/80">{review.text}</p></article>)}
+        {reviewCopy.slice(0, 4).map((review) => 
+          <article key={review.name} className="min-w-0">
+            <div className="flex items-center gap-3">
+              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
+                <Image src={review.avatar} alt={`Foto de ${review.name}`} fill sizes="40px" className="object-cover" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold">{review.name}</p>
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span className="flex">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="h-3 w-3 fill-foreground text-foreground" />)}
+            </span> · há {review.name === "Marina" ? "2 dias" : "3 semanas"}
+            </p>
+              </div>
+            </div>
+           
+            <p className="mt-2 text-sm leading-6 text-foreground/80">{review.text}</p>
+          </article>)}
       </div>
     </section>
   );
