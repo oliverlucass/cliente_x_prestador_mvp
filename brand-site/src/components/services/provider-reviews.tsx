@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { BadgeCheck, CheckCircle2, CircleDollarSign, MessageCircle, Star } from "lucide-react";
+import { BadgeCheck, CheckCircle2, CircleDollarSign, MessageCircle, Sparkles, Star } from "lucide-react";
 
 import type { Service } from "@/types/service";
 
@@ -19,7 +19,7 @@ export function ProviderReviews({ service }: { service: Service }) {
   ];
 
   return (
-    <section className="mt-9 border-y py-7" aria-labelledby="reviews-title">
+    <section className="border-y py-7" aria-labelledby="reviews-title">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 id="reviews-title" className="flex items-center gap-2 text-xl font-bold"><Star className="h-5 w-5 fill-foreground" /> {service.rating.toFixed(1).replace(".", ",")} · {service.reviewCount} avaliações</h3>
@@ -32,15 +32,18 @@ export function ProviderReviews({ service }: { service: Service }) {
       </div>
 
       <div className="mt-6 rounded-md bg-muted/60 p-4">
-        <p className="text-sm font-bold">O que os clientes destacam</p>
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        <p className="-ml-4 inline-flex items-center gap-1.5 text-sm font-bold">
+          O que os clientes destacam
+          <Sparkles className="h-4 w-4" aria-hidden="true" />
+        </p>
+        <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto pb-1">
           {["Muito cuidadoso", "Boa comunicação", "Pontual", "Preço justo"].map((highlight) => <span key={highlight} className="shrink-0 rounded-full bg-white px-3 py-2 text-xs font-semibold shadow-sm">{highlight}</span>)}
         </div>
       </div>
 
       <div className="mt-6 grid gap-x-8 gap-y-7 sm:grid-cols-2">
         {reviewCopy.slice(0, 4).map((review) => 
-          <article key={review.name} className="min-w-0">
+          <article key={review.name} className="min-w-0 rounded-md border bg-white p-4">
             <div className="flex items-center gap-3">
               <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
                 <Image src={review.avatar} alt={`Foto de ${review.name}`} fill sizes="40px" className="object-cover" />

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import {
   ArrowRight, BadgeCheck, CalendarCheck, CalendarDays, Check, CheckCircle2,
-  ChevronLeft, Clock3, Heart, MapPin, MessageCircle, Send, ShieldCheck,
+  ChevronLeft, Clock3, Hammer, Heart, Home, MapPin, MessageCircle, Send, ShieldCheck,
   Star, X,
 } from "lucide-react";
 
@@ -84,14 +84,15 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
           </div>
           <div className="gap-5 bg-[#f7f9f4] p-4 sm:p-5 md:grid md:grid-cols-[3fr_2fr] md:items-start">
           <div className="min-w-0 rounded-lg border bg-white px-5 pb-8 pt-6 shadow-sm sm:px-8">
-            <div className="flex items-start justify-between gap-5"><div><p className="text-sm font-semibold text-[#527637]">{service.category}</p><h2 className="mt-1 text-2xl font-bold leading-tight">{service.title}</h2></div><span className="flex shrink-0 items-center gap-1 pt-1 text-sm font-semibold"><Star className="h-4 w-4 fill-foreground" /> {service.rating.toFixed(2).replace(".", ",")}</span></div>
-            <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin className="h-4 w-4" /> {service.neighborhood}, {service.city} · {service.distance.toFixed(1).replace(".", ",")} km</p>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-start justify-between gap-5"><h2 className="text-2xl font-bold leading-tight">{service.title}</h2><span className="flex shrink-0 items-center gap-1 pt-1 text-sm font-semibold"><Star className="h-4 w-4 fill-foreground" /> {service.rating.toFixed(2).replace(".", ",")}</span></div>
+              <p className="leading-7 text-muted-foreground">{service.description}</p>
+              <div className="flex flex-wrap gap-2">{service.tags.map((tag) => <span key={tag} className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">{tag}</span>)}</div>
+            </div>
 
-            <div className="my-6 flex items-center gap-3 border-y py-5"><div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={service.providerImageUrl} alt={service.provider} fill sizes="56px" className="object-cover" /></div><div className="min-w-0 flex-1"><p className="flex items-center gap-1 font-semibold">{service.provider} {service.verified && <BadgeCheck className="h-4 w-4 fill-foreground text-white" />}</p><p className="text-sm text-muted-foreground">{service.profession} · {service.completedJobs} serviços</p><p className="mt-1 text-xs font-medium text-[#327054]">{service.responseTime}</p></div><button type="button" onClick={() => setChatOpen((value) => !value)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border bg-white hover:bg-muted" aria-label="Conversar"><MessageCircle className="h-[18px] w-[18px]" /></button></div>
+            <div className="mt-6 flex items-center gap-3 border-t py-5"><div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={service.providerImageUrl} alt={service.provider} fill sizes="56px" className="object-cover" /></div><div className="min-w-0 flex-1"><p className="flex items-center gap-1 font-semibold">{service.provider} {service.verified && <BadgeCheck className="h-4 w-4 fill-foreground text-white" />}</p><p className="flex items-center gap-1.5 text-sm text-muted-foreground"><Hammer className="h-4 w-4 shrink-0" /> {service.profession} · {service.completedJobs} serviços</p><p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground"><Home className="h-4 w-4 shrink-0" /> {service.neighborhood}, {service.city} · {service.distance.toFixed(1).replace(".", ",")} km</p><p className="mt-1 text-xs font-medium text-[#327054]">{service.responseTime}</p></div><button type="button" onClick={() => setChatOpen((value) => !value)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border bg-white hover:bg-muted" aria-label="Conversar"><MessageCircle className="h-[18px] w-[18px]" /></button></div>
 
             {chatOpen && <ChatPreview provider={service.provider} />}
-            <p className="leading-7 text-muted-foreground">{service.description}</p>
-            <div className="mt-4 flex flex-wrap gap-2">{service.tags.map((tag) => <span key={tag} className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">{tag}</span>)}</div>
             <ProviderReviews service={service} />
 
             <div className="mt-8">
