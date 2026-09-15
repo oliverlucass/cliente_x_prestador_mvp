@@ -1,16 +1,24 @@
+"use client";
+
 import Image from "next/image";
-import { BadgeCheck, CheckCircle2, CircleDollarSign, MessageCircle, Sparkles, Star } from "lucide-react";
+import { useState } from "react";
+import { BadgeCheck, CheckCircle2, ChevronLeft, ChevronRight, CircleDollarSign, MessageCircle, Sparkles, Star } from "lucide-react";
 
 import type { Service } from "@/types/service";
 
+const reviewsPerPage = 4;
 const reviewCopy = [
   { name: "Marina", area: "Vila Mariana", avatar: "/images/ana.jpg", text: "Muito cuidadoso, explicou tudo antes de começar e entregou o serviço no horário combinado." },
   { name: "Rafael", area: "Aclimação", avatar: "/images/rafael.jpg", text: "Ótima comunicação e trabalho muito bem feito. Já salvei o contato para chamar de novo." },
   { name: "Camila", area: "Saúde", avatar: "/images/luciana.jpg", text: "Pontual, organizado e super tranquilo para combinar os detalhes pelo chat." },
   { name: "Bruno", area: "Moema", avatar: "/images/marcos.jpg", text: "Preço justo e resultado conforme o anúncio. Recomendo bastante." },
+  { name: "Juliana", area: "Paraíso", avatar: "/images/ana.jpg", text: "Serviço impecável e atendimento muito atencioso. Deixou tudo organizado ao terminar." },
 ];
 
 export function ProviderReviews({ service }: { service: Service }) {
+  const [reviewPage, setReviewPage] = useState(0);
+  const reviewPageCount = Math.ceil(reviewCopy.length / reviewsPerPage);
+  const visibleReviews = reviewCopy.slice(reviewPage * reviewsPerPage, (reviewPage + 1) * reviewsPerPage);
   const categories = [
     { label: "Qualidade", value: Math.max(4.6, service.rating - 0.03).toFixed(1), icon: CheckCircle2 },
     { label: "Comunicação", value: Math.min(5, service.rating + 0.02).toFixed(1), icon: MessageCircle },
@@ -41,24 +49,63 @@ export function ProviderReviews({ service }: { service: Service }) {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-x-8 gap-y-7 sm:grid-cols-2">
-        {reviewCopy.slice(0, 4).map((review) => 
-          <article key={review.name} className="h-[160px] min-w-0 rounded-md border bg-white p-4">
-            <div className="flex items-center gap-3">
-              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
-                <Image src={review.avatar} alt={`Foto de ${review.name}`} fill sizes="40px" className="object-cover" />
+      <div className="mt-6">
+        <div className="grid min-h-[724px] gap-x-8 gap-y-7 sm:min-h-[348px] sm:grid-cols-2" aria-live="polite">
+          {visibleReviews.map((review) => 
+            <article key={review.name} className="h-[160px] min-w-0 rounded-md border bg-white p-4">
+              <div className="flex items-center gap-3">
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
+                  <Image src={review.avatar} alt={`Foto de ${review.name}`} fill sizes="40px" className="object-cover" />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">{review.name}</p>
+                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <span className="flex">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="h-3 w-3 fill-foreground text-foreground" />)}
+                    </span> · há {review.name === "Marina" ? "2 dias" : "3 semanas"}
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold">{review.name}</p>
-                <p className="flex items-center gap-1 text-xs text-muted-foreground">
-              <span className="flex">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="h-3 w-3 fill-foreground text-foreground" />)}
-            </span> · há {review.name === "Marina" ? "2 dias" : "3 semanas"}
-            </p>
-              </div>
-            </div>
-           
-            <p className="mt-2 line-clamp-3 text-sm leading-6 text-foreground/80">{review.text}</p>
-          </article>)}
+
+              <p className="mt-2 line-clamp-3 text-sm leading-6 text-foreground/80">{review.text}</p>
+            </article>)}
+        </div>
+
+        <nav className="mt-5 flex items-center justify-center gap-1" aria-label="Paginação das avaliações">
+          <button
+            type="button"
+            onClick={() => setReviewPage((page) => Math.max(0, page - 1))}
+            disabled={reviewPage === 0}
+            className="grid h-9 w-9 place-items-center rounded-md transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-35"
+            aria-label="Ver avaliações anteriores"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          {Array.from({ length: reviewPageCount }, (_, pageIndex) => (
+            <button
+              key={pageIndex}
+              type="button"
+              onClick={() => setReviewPage(pageIndex)}
+              className={`grid h-9 min-w-9 place-items-center rounded-md px-2 text-sm font-semibold transition ${
+                reviewPage === pageIndex ? "bg-foreground text-white" : "hover:bg-muted"
+              }`}
+              aria-label={`Ir para a página ${pageIndex + 1} das avaliações`}
+              aria-current={reviewPage === pageIndex ? "page" : undefined}
+            >
+              {pageIndex + 1}
+            </button>
+          ))}
+
+          <button
+            type="button"
+            onClick={() => setReviewPage((page) => Math.min(reviewPageCount - 1, page + 1))}
+            disabled={reviewPage === reviewPageCount - 1}
+            className="grid h-9 w-9 place-items-center rounded-md transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-35"
+            aria-label="Ver próximas avaliações"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </nav>
       </div>
     </section>
   );
