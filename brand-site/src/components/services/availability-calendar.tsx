@@ -53,10 +53,12 @@ export function AvailabilityCalendar(_props: AvailabilityCalendarProps) {
     ];
   }, [visibleMonth]);
 
-  const monthLabel = visibleMonth.toLocaleDateString("pt-BR", {
-    month: "long",
-    year: "numeric",
-  });
+  const monthLabel = visibleMonth
+    .toLocaleDateString("pt-BR", {
+      month: "long",
+      year: "numeric",
+    })
+    .replace(/\s+de\s+/i, " - ");
 
   const canGoToPreviousMonth =
     visibleMonth.getFullYear() > today.getFullYear() ||
@@ -81,18 +83,15 @@ export function AvailabilityCalendar(_props: AvailabilityCalendarProps) {
   return (
     <div className="mt-3 rounded-lg border bg-white p-3 sm:p-4">
       <div className="flex items-center justify-center gap-3">
-        {canGoToPreviousMonth ? (
-          <button
-            type="button"
-            onClick={() => changeMonth(-1)}
-            className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
-            aria-label="Mês anterior"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-        ) : (
-          <span className="h-8 w-8" aria-hidden="true" />
-        )}
+        <button
+          type="button"
+          onClick={() => changeMonth(-1)}
+          disabled={!canGoToPreviousMonth}
+          className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground disabled:cursor-not-allowed disabled:opacity-35"
+          aria-label="Mês anterior"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
         <p className="min-w-36 text-center text-sm font-bold capitalize">
           {monthLabel}
         </p>

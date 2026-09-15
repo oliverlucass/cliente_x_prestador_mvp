@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import {
   ArrowRight, BadgeCheck, CalendarCheck, CalendarDays, Check, CheckCircle2,
-  ChevronLeft, Clock3, Hammer, Heart, Home, MapPin, MessageCircle, Send, ShieldCheck,
+  ChevronLeft, Clock3, Hammer, Heart, Home, MapPin, ShieldCheck,
   Star, X,
 } from "lucide-react";
 
@@ -53,8 +53,7 @@ function getInitialAvailableDate() {
 export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetailProps) {
   const [stage, setStage] = useState<Stage>("booking");
   const [selectedDate, setSelectedDate] = useState(getInitialAvailableDate);
-  const [message, setMessage] = useState("Preciso instalar duas luminárias na sala.");
-  const [chatOpen, setChatOpen] = useState(false);
+  const [message] = useState("Preciso instalar duas luminárias na sala.");
   const [calendarAdded, setCalendarAdded] = useState(false);
   const [alternateOpen, setAlternateOpen] = useState(false);
   const [counterOffer, setCounterOffer] = useState(false);
@@ -85,14 +84,12 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
           <div className="gap-5 bg-[#f7f9f4] p-4 sm:p-5 md:grid md:grid-cols-[3fr_2fr] md:items-start">
           <div className="min-w-0 rounded-lg border bg-white px-5 pb-8 pt-6 shadow-sm sm:px-8">
             <div className="flex flex-col gap-4">
-              <div className="flex items-start justify-between gap-5"><h2 className="text-2xl font-bold leading-tight">{service.title}</h2><span className="flex shrink-0 items-center gap-1 pt-1 text-sm font-semibold"><Star className="h-4 w-4 fill-foreground" /> {service.rating.toFixed(2).replace(".", ",")}</span></div>
+              <h2 className="text-2xl font-bold leading-tight">{service.title}</h2>
               <p className="leading-7 text-muted-foreground">{service.description}</p>
-              <div className="flex flex-wrap gap-2">{service.tags.map((tag) => <span key={tag} className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium">{tag}</span>)}</div>
+              <div className="flex flex-wrap gap-2">{service.tags.map((tag) => <span key={tag} className="rounded-md bg-[#D7FA68] px-3 py-1.5 text-xs font-medium">{tag}</span>)}</div>
             </div>
 
-            <div className="mt-6 flex items-center gap-3 border-t py-5"><div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={service.providerImageUrl} alt={service.provider} fill sizes="56px" className="object-cover" /></div><div className="min-w-0 flex-1"><p className="flex items-center gap-1 font-semibold">{service.provider} {service.verified && <BadgeCheck className="h-4 w-4 fill-foreground text-white" />}</p><p className="flex items-center gap-1.5 text-sm text-muted-foreground"><Hammer className="h-4 w-4 shrink-0" /> {service.profession} · {service.completedJobs} serviços</p><p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground"><Home className="h-4 w-4 shrink-0" /> {service.neighborhood}, {service.city} · {service.distance.toFixed(1).replace(".", ",")} km</p><p className="mt-1 text-xs font-medium text-[#327054]">{service.responseTime}</p></div><button type="button" onClick={() => setChatOpen((value) => !value)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border bg-white hover:bg-muted" aria-label="Conversar"><MessageCircle className="h-[18px] w-[18px]" /></button></div>
-
-            {chatOpen && <ChatPreview provider={service.provider} />}
+            <div className="mt-6 flex items-center gap-3 border-t py-5"><div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={service.providerImageUrl} alt={service.provider} fill sizes="56px" className="object-cover" /></div><div className="min-w-0 flex-1"><p className="flex items-center gap-1 font-semibold">{service.provider} {service.verified && <BadgeCheck className="h-4 w-4 fill-foreground text-white" />}</p><p className="flex items-center gap-1.5 text-sm text-muted-foreground"><Hammer className="h-4 w-4 shrink-0" /> {service.profession} · {service.completedJobs} serviços</p><p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground"><Home className="h-4 w-4 shrink-0" /> {service.neighborhood}, {service.city} · {service.distance.toFixed(1).replace(".", ",")} km</p><p className="mt-1 text-xs font-medium text-[#327054]">{service.responseTime}</p></div></div>
             <ProviderReviews service={service} />
 
             <div className="mt-8">
@@ -111,8 +108,7 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
 
           <div className="mt-5 rounded-lg border bg-white p-5"><div className="flex items-center gap-3"><div className="relative h-11 w-11 overflow-hidden rounded-full"><Image src={service.providerImageUrl} alt={service.provider} fill sizes="44px" className="object-cover" /></div><div><p className="font-semibold">{service.provider}</p><p className="text-xs text-muted-foreground">{service.responseTime}</p></div><span className="ml-auto rounded-full bg-[#eef3e9] px-2.5 py-1 text-xs font-semibold">{counterOffer ? "Sua vez" : "Aguardando"}</span></div><dl className="mt-5 grid grid-cols-2 gap-4 border-t pt-4 text-sm"><div><dt className="text-xs text-muted-foreground">Data</dt><dd className="mt-1 capitalize font-semibold">{counterOffer ? "sábado, 09:00" : selectedDateLabel}</dd></div><div><dt className="text-xs text-muted-foreground">Horário</dt><dd className="mt-1 font-semibold">{counterOffer ? "09:00" : selectedTime}</dd></div><div className="col-span-2"><dt className="text-xs text-muted-foreground">Seu pedido</dt><dd className="mt-1 leading-6">{message}</dd></div></dl></div>
 
-          {counterOffer ? <div className="mt-4 grid gap-2 sm:grid-cols-2"><button type="button" onClick={() => setStage("confirmed")} className="h-12 rounded-md bg-foreground font-semibold text-white">Aceitar sábado às 09:00</button><button type="button" onClick={() => setChatOpen((value) => !value)} className="h-12 rounded-md border bg-white font-semibold">Conversar antes</button></div> : <div className="mt-6"><p className="text-sm font-bold">O que acontece agora</p><ol className="mt-4 space-y-4"><StatusStep done label="Você enviou os detalhes" detail="Agora mesmo" /><StatusStep active label={`${service.provider.split(" ")[0]} revisa o pedido`} detail="Normalmente responde em poucos minutos" /><StatusStep label="Horário confirmado" detail="Depois do aceite, entra na agenda dos dois" /></ol><button type="button" onClick={() => setStage("provider")} className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-md border bg-white font-semibold">Ver como chega para {service.provider.split(" ")[0]} <ArrowRight className="h-4 w-4" /></button></div>}
-          {chatOpen && <div className="mt-4"><ChatPreview provider={service.provider} /></div>}
+          {counterOffer ? <button type="button" onClick={() => setStage("confirmed")} className="mt-4 h-12 w-full rounded-md bg-foreground font-semibold text-white">Aceitar sábado às 09:00</button> : <div className="mt-6"><p className="text-sm font-bold">O que acontece agora</p><ol className="mt-4 space-y-4"><StatusStep done label="Você enviou os detalhes" detail="Agora mesmo" /><StatusStep active label={`${service.provider.split(" ")[0]} revisa o pedido`} detail="Normalmente responde em poucos minutos" /><StatusStep label="Horário confirmado" detail="Depois do aceite, entra na agenda dos dois" /></ol><button type="button" onClick={() => setStage("provider")} className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-md border bg-white font-semibold">Ver como chega para {service.provider.split(" ")[0]} <ArrowRight className="h-4 w-4" /></button></div>}
         </div>}
 
         {stage === "provider" && <div className="px-5 py-7 sm:px-8"><div className="rounded-lg bg-foreground p-5 text-white"><p className="text-xs font-bold uppercase text-[#c9f24a]">Novo pedido perto de você</p><h2 className="mt-2 text-2xl font-black">Instalação de luminárias</h2><p className="mt-2 flex items-center gap-1.5 text-sm text-white/70"><MapPin className="h-4 w-4" /> Vila Mariana · 1,2 km</p></div>
@@ -123,8 +119,7 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
 
         {stage === "confirmed" && <div className="px-5 py-7 sm:px-8"><div className="rounded-lg bg-[#e9f8b5] p-6 text-center"><span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-foreground text-[#c9f24a]"><Check className="h-7 w-7" strokeWidth={3} /></span><h2 className="mt-4 text-2xl font-black">Fechô!</h2><p className="mt-2 text-sm text-muted-foreground">O serviço foi confirmado e já está na agenda.</p></div>
           <div className="mt-5 rounded-lg border bg-white p-5"><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-semibold uppercase text-muted-foreground">{service.title}</p><p className="mt-1 capitalize font-bold">{counterOffer ? "sábado" : selectedDateLabel} · {counterOffer ? "09:00" : selectedTime}</p></div><CalendarCheck className="h-6 w-6 text-[#327054]" /></div><div className="mt-4 flex items-center gap-3 border-t pt-4"><div className="relative h-10 w-10 overflow-hidden rounded-full"><Image src={service.providerImageUrl} alt={service.provider} fill sizes="40px" className="object-cover" /></div><div><p className="text-sm font-semibold">{service.provider}</p><p className="text-xs text-muted-foreground">{service.neighborhood}, São Paulo</p></div></div></div>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2"><button type="button" onClick={() => setCalendarAdded(true)} className={cn("flex h-12 items-center justify-center gap-2 rounded-md border bg-white font-semibold", calendarAdded && "bg-[#edf7ef] text-[#277246]")}>{calendarAdded ? <CheckCircle2 className="h-4 w-4" /> : <CalendarDays className="h-4 w-4" />}{calendarAdded ? "Adicionado à agenda" : "Adicionar à agenda"}</button><button type="button" onClick={() => setChatOpen((value) => !value)} className="flex h-12 items-center justify-center gap-2 rounded-md bg-foreground font-semibold text-white"><MessageCircle className="h-4 w-4" /> Abrir conversa</button></div>
-          {chatOpen && <div className="mt-4"><ChatPreview provider={service.provider} confirmed /></div>}
+          <button type="button" onClick={() => setCalendarAdded(true)} className={cn("mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-md border bg-white font-semibold", calendarAdded && "bg-[#edf7ef] text-[#277246]")}>{calendarAdded ? <CheckCircle2 className="h-4 w-4" /> : <CalendarDays className="h-4 w-4" />}{calendarAdded ? "Adicionado à agenda" : "Adicionar à agenda"}</button>
           <div className="mt-7"><p className="text-sm font-bold">Tudo organizado</p><ol className="mt-4 space-y-4"><StatusStep done label="Pedido aceito" detail={`${service.provider.split(" ")[0]} confirmou o serviço`} /><StatusStep active label="Serviço agendado" detail="Você receberá um lembrete antes do horário" /><StatusStep label="Conclusão e avaliação" detail="Avalie somente depois que o trabalho terminar" /></ol></div>
         </div>}
       </section>
@@ -134,8 +129,4 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
 
 function StatusStep({ label, detail, done, active }: { label: string; detail: string; done?: boolean; active?: boolean }) {
   return <li className="flex gap-3"><span className={cn("mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border text-xs", done && "border-[#327054] bg-[#327054] text-white", active && "border-[#a3c82f] bg-[#e9f8b5]")}>{done ? <Check className="h-3.5 w-3.5" /> : active ? <Clock3 className="h-3.5 w-3.5" /> : "3"}</span><div><p className="text-sm font-semibold">{label}</p><p className="mt-0.5 text-xs text-muted-foreground">{detail}</p></div></li>;
-}
-
-function ChatPreview({ provider, confirmed }: { provider: string; confirmed?: boolean }) {
-  return <div className="overflow-hidden rounded-lg border bg-white"><div className="flex items-center gap-2 border-b px-4 py-3"><span className="h-2 w-2 rounded-full bg-emerald-500" /><p className="text-sm font-semibold">Conversa com {provider.split(" ")[0]}</p></div><div className="space-y-3 bg-muted/40 p-4 text-sm"><p className="mr-10 rounded-md bg-white p-3 shadow-sm">Oi! Vi sua solicitação. {confirmed ? "Está tudo certo para o horário combinado." : "As luminárias já estão no local?"}</p><p className="ml-10 rounded-md bg-foreground p-3 text-white">Sim, já comprei as duas. Posso enviar uma foto também.</p></div><div className="flex gap-2 border-t p-3"><input placeholder="Escreva uma mensagem" className="h-10 flex-1 rounded-md border px-3 text-sm outline-none" /><button type="button" className="grid h-10 w-10 place-items-center rounded-md bg-foreground text-white" aria-label="Enviar mensagem"><Send className="h-4 w-4" /></button></div></div>;
 }

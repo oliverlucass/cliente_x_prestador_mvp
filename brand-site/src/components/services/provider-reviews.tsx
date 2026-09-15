@@ -45,7 +45,7 @@ export function ProviderReviews({ service }: { service: Service }) {
           <Sparkles className="h-4 w-4" aria-hidden="true" />
         </p>
         <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto pb-1">
-          {["Muito cuidadoso", "Boa comunicação", "Pontual", "Preço justo"].map((highlight) => <span key={highlight} className="shrink-0 rounded-full bg-white px-3 py-2 text-xs font-semibold shadow-sm">{highlight}</span>)}
+          {["Muito cuidadoso", "Boa comunicação", "Pontual", "Preço justo"].map((highlight) => <span key={highlight} className="shrink-0 rounded-full border bg-white px-3 py-2 text-xs font-semibold shadow-sm">{highlight}</span>)}
         </div>
       </div>
 
