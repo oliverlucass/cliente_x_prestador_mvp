@@ -1,13 +1,12 @@
 "use client";
 
-import type { LucideIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   ArrowDownUp, Bell, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, CircleUserRound,
-  Compass, Drill, Flower2, Heart, House, LayoutGrid, ListFilter,
+  Compass, Heart, House, ListFilter,
   LocateFixed, Map as MapIcon, MapPin, MessageCircle, Navigation,
-  PaintRoller, PawPrint, Search, SlidersHorizontal, SprayCan,
-  Wrench, X, Zap,
+  Search, SlidersHorizontal,
+  Wrench, X,
 } from "lucide-react";
 
 import { BrandLogo, BrandMark } from "@/components/brand/brand-logo";
@@ -19,15 +18,9 @@ import { categories, services } from "@/data/mock/services";
 import { cn } from "@/lib/utils";
 import type { Service } from "@/types/service";
 
-const categoryIcons: Record<string, LucideIcon> = {
-  Todos: LayoutGrid,
-  Limpeza: SprayCan,
-  Reparos: Wrench,
-  Elétrica: Zap,
-  Pintura: PaintRoller,
-  Montagem: Drill,
-  Jardinagem: Flower2,
-  "Pet care": PawPrint,
+const categoryLabels: Record<string, string> = {
+  Todos: "Serviços",
+  Limpeza: "Profissionais",
 };
 
 const quickSearches = ["Pintor", "Eletricista", "Montador", "Diarista"];
@@ -118,11 +111,20 @@ export function MarketplaceHome() {
       </section>
 
       <section className="border-b bg-white">
-        <div className="scrollbar-hide mx-auto flex max-w-[1440px] gap-1 overflow-x-auto px-4 sm:px-6 md:justify-center lg:px-10">
-          {categories.map((category) => {
-            const Icon = categoryIcons[category];
-            return <button key={category} type="button" onClick={() => setActiveCategory(category)} className={cn("flex min-w-[82px] shrink-0 flex-col items-center gap-1.5 border-b-2 px-3 py-4 text-xs font-semibold transition", activeCategory === category ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground")}><Icon className="h-5 w-5" />{category}</button>;
-          })}
+        <div className="scrollbar-hide mx-auto flex max-w-[1440px] gap-8 overflow-x-auto px-4 sm:px-6 md:justify-center lg:px-10">
+          {categories.map((category) => (
+            <button
+              key={category}
+              type="button"
+              onClick={() => setActiveCategory(category)}
+              className={cn(
+                "flex h-[76px] min-w-[160px] shrink-0 items-center justify-center border-b-2 px-8 text-xs font-bold uppercase tracking-wide transition",
+                activeCategory === category ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {categoryLabels[category] ?? category}
+            </button>
+          ))}
         </div>
       </section>
 
@@ -140,7 +142,7 @@ export function MarketplaceHome() {
         </div></div>}
 
         {view === "list" ? (
-          filtered.length ? <div className="mt-7 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{filtered.map((service) => <ServiceCard key={service.id} service={service} saved={saved.includes(service.id)} onSave={() => toggleSave(service.id)} onOpen={() => setSelectedService(service)} />)}</div> : <div className="mt-10 border-y py-16 text-center"><Search className="mx-auto h-8 w-8 text-muted-foreground" /><h3 className="mt-3 text-lg font-bold">Nada por aqui ainda</h3><p className="mt-1 text-sm text-muted-foreground">Tente aumentar a distância ou buscar outro serviço.</p></div>
+          filtered.length ? <div className="mt-7 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{filtered.map((service) => <ServiceCard key={service.id} service={service} onOpen={() => setSelectedService(service)} />)}</div> : <div className="mt-10 border-y py-16 text-center"><Search className="mx-auto h-8 w-8 text-muted-foreground" /><h3 className="mt-3 text-lg font-bold">Nada por aqui ainda</h3><p className="mt-1 text-sm text-muted-foreground">Tente aumentar a distância ou buscar outro serviço.</p></div>
         ) : (
           <div className="relative mt-7 h-[520px] overflow-hidden rounded-lg border bg-[#dcead8]">
             <div className="absolute inset-0 opacity-50 [background-image:linear-gradient(32deg,transparent_45%,white_46%,white_50%,transparent_51%),linear-gradient(122deg,transparent_45%,white_46%,white_50%,transparent_51%)] [background-size:130px_130px]" />

@@ -1,6 +1,6 @@
 import type { Service } from "@/types/service";
 
-export const categories = ["Todos", "Limpeza", "Reparos", "Elétrica", "Pintura", "Montagem", "Jardinagem", "Pet care"] as const;
+export const categories = ["Todos", "Limpeza"] as const;
 
 export const services: Service[] = [
   {
