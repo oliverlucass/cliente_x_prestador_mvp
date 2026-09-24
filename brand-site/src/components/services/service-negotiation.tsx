@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import type { Service } from "@/types/service";
 
-export function ServiceNegotiation({ service }: { service: Service }) {
+export function ServiceNegotiation({ service, onSubmit }: { service: Service; onSubmit: () => void }) {
   const [editingValue, setEditingValue] = useState(false);
   const [proposalValue, setProposalValue] = useState("");
 
@@ -39,8 +39,8 @@ export function ServiceNegotiation({ service }: { service: Service }) {
           </button>
         </div>
 
-        <button type="button" className="mt-5 h-12 w-full rounded-md bg-foreground px-4 text-sm font-bold text-white transition hover:opacity-90">
-          Enviar solicitacao
+        <button type="button" onClick={onSubmit} className="mt-5 h-12 w-full rounded-md bg-foreground px-4 text-sm font-bold text-white transition hover:opacity-90">
+          Enviar solicitação
         </button>
         <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">O valor será combinado com o prestador antes da confirmação.</p>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import {
   ArrowRight, BadgeCheck, CalendarCheck, CalendarDays, Check, CheckCircle2,
@@ -99,7 +100,7 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
 
             <div className="mt-6 flex gap-3 rounded-lg bg-[#edf7ef] py-4 pr-4"><ShieldCheck className="h-5 w-5 shrink-0 text-[#277246]" /><div><p className="text-sm font-semibold">Primeiro vocês combinam</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Enviar a solicitação não confirma nem cobra o serviço. {service.provider} revisa os detalhes e aceita o horário.</p></div></div>
           </div>
-          <ServiceNegotiation service={service} />
+          <ServiceNegotiation service={service} onSubmit={() => setStage("requested")} />
           </div>
         </>}
 
@@ -108,7 +109,7 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
 
           <div className="mt-5 rounded-lg border bg-white p-5"><div className="flex items-center gap-3"><div className="relative h-11 w-11 overflow-hidden rounded-full"><Image src={service.providerImageUrl} alt={service.provider} fill sizes="44px" className="object-cover" /></div><div><p className="font-semibold">{service.provider}</p><p className="text-xs text-muted-foreground">{service.responseTime}</p></div><span className="ml-auto rounded-full bg-[#eef3e9] px-2.5 py-1 text-xs font-semibold">{counterOffer ? "Sua vez" : "Aguardando"}</span></div><dl className="mt-5 grid grid-cols-2 gap-4 border-t pt-4 text-sm"><div><dt className="text-xs text-muted-foreground">Data</dt><dd className="mt-1 capitalize font-semibold">{counterOffer ? "sábado, 09:00" : selectedDateLabel}</dd></div><div><dt className="text-xs text-muted-foreground">Horário</dt><dd className="mt-1 font-semibold">{counterOffer ? "09:00" : selectedTime}</dd></div><div className="col-span-2"><dt className="text-xs text-muted-foreground">Seu pedido</dt><dd className="mt-1 leading-6">{message}</dd></div></dl></div>
 
-          {counterOffer ? <button type="button" onClick={() => setStage("confirmed")} className="mt-4 h-12 w-full rounded-md bg-foreground font-semibold text-white">Aceitar sábado às 09:00</button> : <div className="mt-6"><p className="text-sm font-bold">O que acontece agora</p><ol className="mt-4 space-y-4"><StatusStep done label="Você enviou os detalhes" detail="Agora mesmo" /><StatusStep active label={`${service.provider.split(" ")[0]} revisa o pedido`} detail="Normalmente responde em poucos minutos" /><StatusStep label="Horário confirmado" detail="Depois do aceite, entra na agenda dos dois" /></ol><button type="button" onClick={() => setStage("provider")} className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-md border bg-white font-semibold">Ver como chega para {service.provider.split(" ")[0]} <ArrowRight className="h-4 w-4" /></button></div>}
+          {counterOffer ? <button type="button" onClick={() => setStage("confirmed")} className="mt-4 h-12 w-full rounded-md bg-foreground font-semibold text-white">Aceitar sábado às 09:00</button> : <div className="mt-6"><p className="text-sm font-bold">O que acontece agora</p><ol className="mt-4 space-y-4"><StatusStep done label="Você enviou os detalhes" detail="Agora mesmo" /><StatusStep active label={`${service.provider.split(" ")[0]} revisa o pedido`} detail="Normalmente responde em poucos minutos" /><StatusStep label="Horário confirmado" detail="Depois do aceite, entra na agenda dos dois" /></ol><Link href="/solicitacoes" className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-md bg-foreground font-semibold text-white">Acompanhar em minhas solicitações <ArrowRight className="h-4 w-4" /></Link><button type="button" onClick={() => setStage("provider")} className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-md border bg-white font-semibold">Ver como chega para {service.provider.split(" ")[0]}</button></div>}
         </div>}
 
         {stage === "provider" && <div className="px-5 py-7 sm:px-8"><div className="rounded-lg bg-foreground p-5 text-white"><p className="text-xs font-bold uppercase text-[#c9f24a]">Novo pedido perto de você</p><h2 className="mt-2 text-2xl font-black">Instalação de luminárias</h2><p className="mt-2 flex items-center gap-1.5 text-sm text-white/70"><MapPin className="h-4 w-4" /> Vila Mariana · 1,2 km</p></div>
