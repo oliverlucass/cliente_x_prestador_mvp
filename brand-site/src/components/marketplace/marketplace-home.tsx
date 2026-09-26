@@ -2,15 +2,15 @@
 
 import { useMemo, useState } from "react";
 import {
-  ArrowDownUp, Bell, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, CircleUserRound,
+  ArrowDownUp, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, CircleUserRound,
   Compass, Heart, House, ListFilter,
   LocateFixed, Map as MapIcon, MapPin, MessageCircle, Navigation,
   Search, SlidersHorizontal,
   Wrench, X,
 } from "lucide-react";
 
-import { BrandLogo, BrandMark } from "@/components/brand/brand-logo";
-import { AccountMenu } from "@/components/account/account-menu";
+import { BrandMark } from "@/components/brand/brand-logo";
+import { MarketplaceHeader } from "@/components/layout/marketplace-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { DistanceFilter } from "@/components/search/distance-filter";
 import { ServiceCard } from "@/components/services/service-card";
@@ -81,20 +81,7 @@ export function MarketplaceHome() {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-4 px-4 sm:px-6 lg:px-10">
-          <a href="#inicio" className="shrink-0" aria-label="Fechô, página inicial">
-            <BrandLogo />
-          </a>
-          <nav className="ml-auto hidden items-center gap-1 lg:flex">
-            <a href="#explorar" className="rounded-md px-3 py-2 text-sm font-semibold hover:bg-muted">Explorar</a>
-            <button type="button" className="rounded-md px-3 py-2 text-sm font-semibold hover:bg-muted">Meus pedidos</button>
-            <button type="button" className="rounded-md border border-foreground bg-foreground px-4 py-2 text-sm font-semibold text-background hover:opacity-90">Anunciar serviço</button>
-          </nav>
-          <button type="button" className="relative ml-auto grid h-10 w-10 place-items-center rounded-full hover:bg-muted lg:ml-0" aria-label="Notificações"><Bell className="h-5 w-5" /><span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#a7ce32] ring-2 ring-background" /></button>
-          <AccountMenu />
-        </div>
-      </header>
+      <MarketplaceHeader />
 
       <section id="inicio" className="relative overflow-hidden bg-foreground text-white">
         <BrandMark className="pointer-events-none absolute right-8 top-8 hidden h-52 w-52 text-white/[0.08] md:block lg:right-16 lg:top-1/2 lg:h-72 lg:w-72 lg:-translate-y-1/2 lg:text-white/[0.12]" accentClassName="text-[#c9f24a]" />
