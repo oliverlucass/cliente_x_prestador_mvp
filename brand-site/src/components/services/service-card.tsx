@@ -32,8 +32,8 @@ export function ServiceCard({ service, onOpen, className }: ServiceCardProps) {
       >
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted">
           <Image src={service.imageUrl} alt={service.imageAlt} fill sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 25vw" className="object-cover transition duration-500 group-hover:scale-[1.025]" />
-          <div className="absolute left-3 top-3 h-12 w-12 overflow-hidden rounded-full bg-muted shadow-sm">
-            <Image src={service.providerImageUrl} alt={service.provider} fill sizes="48px" className="object-cover" />
+          <div className="absolute bottom-3 left-3 h-10 w-10 overflow-hidden rounded-full bg-muted shadow-sm">
+            <Image src={service.providerImageUrl} alt={service.provider} fill sizes="40px" className="object-cover" />
           </div>
           {service.availableToday && (
             <span className="absolute right-3 top-3 flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">

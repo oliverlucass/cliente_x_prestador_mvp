@@ -4,7 +4,17 @@ import Image from "next/image";
 import { useState } from "react";
 import { BadgeCheck, CheckCircle2, ChevronLeft, ChevronRight, CircleDollarSign, MessageCircle, Sparkles, Star } from "lucide-react";
 
+import { ReviewPhotoStack } from "@/components/services/review-photo-stack";
 import type { Service } from "@/types/service";
+
+const reviewPhotos = [
+  "/images/limpeza.jpg",
+  "/images/montagem.jpg",
+  "/images/pintura.jpg",
+  "/images/hidraulica.jpg",
+  "/images/eletrica.jpg",
+  "/images/jardinagem.jpg",
+] as const;
 
 const reviewsPerPage = 4;
 const reviewCopy = [
@@ -51,23 +61,35 @@ export function ProviderReviews({ service }: { service: Service }) {
 
       <div className="mt-6">
         <div className="grid min-h-[724px] gap-x-8 gap-y-7 sm:min-h-[348px] sm:grid-cols-2" aria-live="polite">
-          {visibleReviews.map((review) => 
+          {visibleReviews.map((review, index) => {
+            const photoIndex = reviewPage * reviewsPerPage + index;
+            const photos: [string, string] = [
+              reviewPhotos[photoIndex % reviewPhotos.length],
+              reviewPhotos[(photoIndex + 1) % reviewPhotos.length],
+            ];
+
+            return (
             <article key={review.name} className="h-[160px] min-w-0 rounded-md border bg-white p-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
                 <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
                   <Image src={review.avatar} alt={`Foto de ${review.name}`} fill sizes="40px" className="object-cover" />
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold">{review.name}</p>
-                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <span className="flex">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="h-3 w-3 fill-foreground text-foreground" />)}
-                    </span> · há {review.name === "Marina" ? "2 dias" : "3 semanas"}
-                  </p>
                 </div>
+                </div>
+                <ReviewPhotoStack photos={photos} />
               </div>
 
-              <p className="mt-2 line-clamp-3 text-sm leading-6 text-foreground/80">{review.text}</p>
-            </article>)}
+              <p className="mt-2 flex items-center justify-start gap-1 text-xs text-muted-foreground">
+                <span className="flex">{Array.from({ length: 5 }).map((_, index) => <Star key={index} className="h-3 w-3 fill-foreground text-foreground" />)}</span>
+                · há {review.name === "Marina" ? "2 dias" : "3 semanas"}
+              </p>
+              <p className="mt-1 line-clamp-3 text-left text-sm leading-6 text-foreground/80">{review.text}</p>
+            </article>
+            );
+          })}
         </div>
 
         <nav className="mt-5 flex items-center justify-center gap-1" aria-label="Paginação das avaliações">

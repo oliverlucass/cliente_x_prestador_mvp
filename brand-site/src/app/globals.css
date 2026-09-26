@@ -116,3 +116,30 @@
 
   .safe-bottom { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
 }
+
+@layer components {
+  .distance-slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 14px;
+    width: 14px;
+    border-radius: 9999px;
+    background: hsl(var(--foreground));
+    border: 2px solid hsl(var(--background));
+    box-shadow: 0 1px 4px rgba(20, 61, 50, 0.18);
+    cursor: pointer;
+  }
+
+  .distance-slider::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    border-radius: 9999px;
+    background: hsl(var(--foreground));
+    border: 2px solid hsl(var(--background));
+    box-shadow: 0 1px 4px rgba(20, 61, 50, 0.18);
+    cursor: pointer;
+  }
+
+  .distance-slider::-moz-range-track {
+    background: transparent;
+  }
+}

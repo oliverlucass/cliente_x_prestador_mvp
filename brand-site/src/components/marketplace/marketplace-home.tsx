@@ -12,6 +12,7 @@ import {
 import { BrandLogo, BrandMark } from "@/components/brand/brand-logo";
 import { AccountMenu } from "@/components/account/account-menu";
 import { SiteFooter } from "@/components/layout/site-footer";
+import { DistanceFilter } from "@/components/search/distance-filter";
 import { ServiceCard } from "@/components/services/service-card";
 import { ServiceDetail } from "@/components/services/service-detail";
 import { categories, services } from "@/data/mock/services";
@@ -28,6 +29,18 @@ const neighborhoods = ["Vila Mariana, São Paulo", "Moema, São Paulo", "Pinheir
 type DateFilter = "any" | "today" | "weekend";
 type SortMode = "default" | "distance" | "price" | "rating";
 
+const dateFilters = [
+  { label: "Qualquer dia", value: "any" as DateFilter, icon: CalendarDays },
+  { label: "Hoje", value: "today" as DateFilter, icon: CheckCircle2 },
+  { label: "Neste fim de semana", value: "weekend" as DateFilter, icon: CalendarDays },
+];
+
+const sortFilters = [
+  { label: "Mais perto", value: "distance" as SortMode, icon: MapPin },
+  { label: "Menor preço", value: "price" as SortMode, icon: ArrowDownUp },
+  { label: "Melhor avaliados", value: "rating" as SortMode, icon: CheckCircle2 },
+];
+
 export function MarketplaceHome() {
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("Vila Mariana, São Paulo");
@@ -37,7 +50,7 @@ export function MarketplaceHome() {
   const [dateFilter, setDateFilter] = useState<DateFilter>("any");
   const [sortMode, setSortMode] = useState<SortMode>("default");
   const [showFilters, setShowFilters] = useState(false);
-  const [radius, setRadius] = useState(6);
+  const [radius, setRadius] = useState(5);
   const [view, setView] = useState<"list" | "map">("list");
   const [saved, setSaved] = useState<string[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -74,7 +87,7 @@ export function MarketplaceHome() {
             <BrandLogo />
           </a>
           <nav className="ml-auto hidden items-center gap-1 lg:flex">
-            <a href="#servicos" className="rounded-md px-3 py-2 text-sm font-semibold hover:bg-muted">Explorar</a>
+            <a href="#explorar" className="rounded-md px-3 py-2 text-sm font-semibold hover:bg-muted">Explorar</a>
             <button type="button" className="rounded-md px-3 py-2 text-sm font-semibold hover:bg-muted">Meus pedidos</button>
             <button type="button" className="rounded-md border border-foreground bg-foreground px-4 py-2 text-sm font-semibold text-background hover:opacity-90">Anunciar serviço</button>
           </nav>
@@ -110,7 +123,7 @@ export function MarketplaceHome() {
         </div>
       </section>
 
-      <section className="border-b bg-white">
+      <section id="explorar" className="scroll-mt-16 border-b bg-white">
         <div className="scrollbar-hide mx-auto flex max-w-[1440px] gap-8 overflow-x-auto px-4 sm:px-6 md:justify-center lg:px-10">
           {categories.map((category) => (
             <button
@@ -137,9 +150,53 @@ export function MarketplaceHome() {
           </div>
         </div>
 
-        {showFilters && <div className="mt-4 flex flex-wrap items-center gap-3 border-y bg-white py-4"><span className="text-sm font-semibold">Distância:</span>{[3, 6, 10].map((value) => <button key={value} type="button" onClick={() => setRadius(value)} className={cn("h-9 rounded-full border px-4 text-sm", radius === value && "border-foreground bg-foreground text-white")}>Até {value} km</button>)}<span className="hidden h-6 w-px bg-border sm:block" /><span className="text-sm text-muted-foreground">Os preços publicados são definidos por cada profissional.</span><div className="scrollbar-hide mt-5 flex gap-2 overflow-x-auto pb-1">
-          {[{ label: "Qualquer dia", value: "any" as DateFilter, icon: CalendarDays }, { label: "Hoje", value: "today" as DateFilter, icon: CheckCircle2 }, { label: "Neste fim de semana", value: "weekend" as DateFilter, icon: CalendarDays }, { label: "Mais perto", value: "distance" as SortMode, icon: MapPin }, { label: "Menor preço", value: "price" as SortMode, icon: ArrowDownUp }, { label: "Melhor avaliados", value: "rating" as SortMode, icon: CheckCircle2 }].map((item) => { const Icon = item.icon; const active = ["any", "today", "weekend"].includes(item.value) ? dateFilter === item.value : sortMode === item.value; return <button key={item.label} type="button" onClick={() => { if (["any", "today", "weekend"].includes(item.value)) { setDateFilter(item.value as DateFilter); setTodayOnly(item.value === "today"); } else setSortMode(item.value as SortMode); }} className={cn("flex h-9 shrink-0 items-center gap-1.5 rounded-full border bg-white px-3 text-xs font-semibold", active && "border-foreground bg-foreground text-white")}><Icon className="h-3.5 w-3.5" /> {item.label}</button>; })}
-        </div></div>}
+        {showFilters && (
+          <div className="mt-4 space-y-4 border-y bg-white py-4">
+            <DistanceFilter value={radius} onChange={setRadius} />
+            <div>
+              <p className="text-sm font-semibold">Data</p>
+              <div className="scrollbar-hide mt-2 flex gap-2 overflow-x-auto pb-1">
+              {dateFilters.map((item) => {
+                const Icon = item.icon;
+                const active = dateFilter === item.value;
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => {
+                      setDateFilter(item.value);
+                      setTodayOnly(item.value === "today");
+                    }}
+                    className={cn("flex h-9 shrink-0 items-center gap-1.5 rounded-full border bg-white px-3 text-xs font-semibold", active && "border-foreground bg-foreground text-white")}
+                  >
+                    <Icon className="h-3.5 w-3.5" /> {item.label}
+                  </button>
+                );
+              })}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Ordenar por</p>
+              <div className="scrollbar-hide mt-2 flex gap-2 overflow-x-auto pb-1">
+                {sortFilters.map((item) => {
+                  const Icon = item.icon;
+                  const active = sortMode === item.value;
+                  return (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={() => setSortMode(item.value)}
+                      className={cn("flex h-9 shrink-0 items-center gap-1.5 rounded-full border bg-white px-3 text-xs font-semibold", active && "border-foreground bg-foreground text-white")}
+                    >
+                      <Icon className="h-3.5 w-3.5" /> {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">Os preços publicados são definidos por cada profissional.</p>
+          </div>
+        )}
 
         {view === "list" ? (
           filtered.length ? <div className="mt-7 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{filtered.map((service) => <ServiceCard key={service.id} service={service} onOpen={() => setSelectedService(service)} />)}</div> : <div className="mt-10 border-y py-16 text-center"><Search className="mx-auto h-8 w-8 text-muted-foreground" /><h3 className="mt-3 text-lg font-bold">Nada por aqui ainda</h3><p className="mt-1 text-sm text-muted-foreground">Tente aumentar a distância ou buscar outro serviço.</p></div>
@@ -162,7 +219,7 @@ export function MarketplaceHome() {
 
       <SiteFooter />
 
-      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-white/95 px-1 pt-2 backdrop-blur md:hidden" aria-label="Navegação principal">{[{ icon: House, label: "Início" }, { icon: Compass, label: "Explorar" }, { icon: Wrench, label: "Pedidos" }, { icon: Heart, label: "Salvos" }, { icon: CircleUserRound, label: "Perfil" }].map((item, index) => <button key={item.label} type="button" className={cn("flex min-w-0 flex-col items-center gap-1 text-[10px] font-medium", index === 0 ? "text-foreground" : "text-muted-foreground")}><item.icon className={cn("h-5 w-5", index === 0 && "fill-[#c9f24a]")} />{item.label}</button>)}</nav>
+      <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-white/95 px-1 pt-2 backdrop-blur md:hidden" aria-label="Navegação principal">{[{ icon: House, label: "Início", href: "#inicio" }, { icon: Compass, label: "Explorar", href: "#explorar" }, { icon: Wrench, label: "Pedidos" }, { icon: Heart, label: "Salvos" }, { icon: CircleUserRound, label: "Perfil" }].map((item, index) => <button key={item.label} type="button" onClick={() => item.href && document.querySelector(item.href)?.scrollIntoView({ behavior: "smooth" })} className={cn("flex min-w-0 flex-col items-center gap-1 text-[10px] font-medium", index === 0 ? "text-foreground" : "text-muted-foreground")}><item.icon className={cn("h-5 w-5", index === 0 && "fill-[#c9f24a]")} />{item.label}</button>)}</nav>
 
       {locationOpen && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 sm:items-center" role="dialog" aria-modal="true" aria-label="Escolher região"><button type="button" className="absolute inset-0" onClick={() => setLocationOpen(false)} aria-label="Fechar" /><div className="relative z-10 w-full max-w-2xl overflow-hidden rounded-t-lg bg-white shadow-2xl sm:rounded-lg"><div className="flex items-center justify-between border-b px-5 py-4"><div><h2 className="font-bold">Onde você quer buscar?</h2><p className="text-xs text-muted-foreground">A localização é aproximada até a confirmação.</p></div><button type="button" onClick={() => setLocationOpen(false)} className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted" aria-label="Fechar"><X className="h-5 w-5" /></button></div><div className="grid sm:grid-cols-[0.9fr_1.1fr]"><div className="p-5"><label className="relative block"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><input placeholder="Bairro, cidade ou CEP" className="h-11 w-full rounded-md border pl-10 pr-3 text-sm outline-none focus:border-foreground" /></label><button type="button" className="mt-3 flex w-full items-center gap-2 rounded-md bg-[#e9f8b5] px-3 py-3 text-sm font-semibold"><LocateFixed className="h-4 w-4" /> Usar minha localização</button><div className="mt-4 space-y-1">{neighborhoods.map((item) => <button key={item} type="button" onClick={() => { setLocation(item); setLocationOpen(false); }} className={cn("flex w-full items-center gap-2 rounded-md px-3 py-3 text-left text-sm hover:bg-muted", location === item && "bg-muted font-semibold")}><MapPin className="h-4 w-4 text-muted-foreground" />{item}</button>)}</div></div><div className="relative hidden min-h-[360px] bg-[#dcead8] sm:block"><div className="absolute inset-0 opacity-50 [background-image:linear-gradient(32deg,transparent_45%,white_46%,white_50%,transparent_51%),linear-gradient(122deg,transparent_45%,white_46%,white_50%,transparent_51%)] [background-size:100px_100px]" /><div className="absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-[#356b52]/50 bg-[#c9f24a]/20" /><span className="absolute left-1/2 top-1/2 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-foreground text-white shadow-lg"><MapPin className="h-5 w-5" /></span></div></div></div></div>}
 
