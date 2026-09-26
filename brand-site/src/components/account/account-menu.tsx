@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeCheck, ChevronDown, CircleHelp, LogOut, MessageCircle, Settings } from "lucide-react";
+import { BadgeCheck, BriefcaseBusiness, ChevronDown, CircleHelp, ClipboardList, LogOut, Settings } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
 function RealizadosIcon() {
@@ -103,14 +103,15 @@ export function AccountMenu() {
 
           <div className="mx-2 my-1.5 h-px bg-[#dce5d8]" role="separator" />
 
-          <button
-            type="button"
+          <Link
+            href="/solicitacoes"
+            onClick={() => setOpen(false)}
             className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             role="menuitem"
           >
-            <MessageCircle className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-            Orçamentos
-          </button>
+            <ClipboardList className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            Minhas solicitações
+          </Link>
           <button
             type="button"
             className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -119,6 +120,15 @@ export function AccountMenu() {
             <RealizadosIcon />
             Realizados
           </button>
+          <Link
+            href="/prestador"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            role="menuitem"
+          >
+            <BriefcaseBusiness className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            Área do prestador
+          </Link>
           <button
             type="button"
             className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
