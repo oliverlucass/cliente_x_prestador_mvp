@@ -16,6 +16,7 @@ import type { Service } from "@/types/service";
 
 interface ServiceDetailProps {
   service: Service | null;
+  searchLocation: string;
   saved: boolean;
   onSave: () => void;
   onClose: () => void;
@@ -50,7 +51,7 @@ function getInitialAvailableDate() {
   return `${year}-${month}-${day}`;
 }
 
-export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetailProps) {
+export function ServiceDetail({ service, searchLocation, saved, onSave, onClose }: ServiceDetailProps) {
   const [stage, setStage] = useState<Stage>("booking");
   const [selectedDate, setSelectedDate] = useState(getInitialAvailableDate);
   const [message] = useState("Preciso instalar duas luminárias na sala.");
@@ -99,7 +100,7 @@ export function ServiceDetail({ service, saved, onSave, onClose }: ServiceDetail
 
             <div className="mt-6 flex gap-3 rounded-lg bg-[#edf7ef] py-4 pr-4"><ShieldCheck className="h-5 w-5 shrink-0 text-[#277246]" /><div><p className="text-sm font-semibold">Primeiro vocês combinam</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Enviar a solicitação não confirma nem cobra o serviço. {service.provider} revisa os detalhes e aceita o horário.</p></div></div>
           </div>
-          <ServiceNegotiation service={service} />
+          <ServiceNegotiation service={service} selectedDate={selectedDate} searchLocation={searchLocation} />
           </div>
         </>}
 

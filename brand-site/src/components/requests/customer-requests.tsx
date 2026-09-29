@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useState } from "react";
 import {
   Banknote, CalendarDays, Check, CircleUserRound,
-  Clock3, Compass, Heart, History, House, MapPin, User, Wrench,
+  Clock3, Compass, Heart, House, MapPin, User, Wrench,
 } from "lucide-react";
 
 import { MarketplaceHeader } from "@/components/layout/marketplace-header";
+import { HistoryButton } from "@/components/requests/history-button";
+import { HistoryTimeline } from "@/components/requests/history-timeline";
 import { cn } from "@/lib/utils";
 
 type RequestStatus = "Cancelada" | "Em andamento" | "Concluída";
@@ -28,6 +30,11 @@ const customerRequests = [
     photo: "/images/limpeza.jpg",
     description: "Apartamento com dois quartos, sala e cozinha. Incluir banheiros e área de serviço. O piso da sala precisa de atenção extra e os armários da cozinha estão com gordura acumulada.",
     duration: "02:20",
+    history: [
+      { date: "17 set", time: "10:35", title: "Pedido enviado", detail: "Você enviou a solicitação de limpeza para Ana." },
+      { date: "18 set", time: "14:10", title: "Horário sugerido", detail: "Ana sugeriu sábado às 09:00." },
+      { date: "19 set", time: "08:20", title: "Pedido cancelado", detail: "A solicitação de limpeza foi cancelada." },
+    ],
   },
   {
     id: 2,
@@ -43,6 +50,11 @@ const customerRequests = [
     photo: "/images/eletrica.jpg",
     description: "Troca de tomadas e revisão do quadro de luz da sala. Também preciso verificar o disjuntor que desarma quando o ar-condicionado liga junto com o chuveiro.",
     duration: "00:30",
+    history: [
+      { date: "27 set", time: "11:40", title: "Pedido enviado", detail: "Você descreveu os reparos necessários." },
+      { date: "28 set", time: "09:15", title: "Valor combinado", detail: "Carlos enviou o valor de R$ 150." },
+      { date: "29 set", time: "09:00", title: "Serviço iniciado", detail: "Os reparos elétricos estão em andamento." },
+    ],
   },
   {
     id: 3,
@@ -58,6 +70,11 @@ const customerRequests = [
     photo: "/images/montagem.jpg",
     description: "Guarda-roupa de três portas e uma estante pequena. As peças estão todas na sala e o manual de montagem está separado em um envelope.",
     duration: "01:45",
+    history: [
+      { date: "19 set", time: "10:20", title: "Pedido enviado", detail: "Você solicitou a montagem dos móveis." },
+      { date: "20 set", time: "16:30", title: "Horário confirmado", detail: "Rafael confirmou a visita." },
+      { date: "21 set", time: "15:45", title: "Serviço concluído", detail: "Montagem dos móveis finalizada." },
+    ],
   },
 ];
 
@@ -97,12 +114,14 @@ export function CustomerRequests() {
 }
 
 function RequestCard({ request, accepted }: { request: (typeof customerRequests)[number]; accepted: boolean }) {
+  const [historyOpen, setHistoryOpen] = useState(false);
   const status = accepted ? "Concluída" : request.status;
   return <article className={cn("overflow-hidden rounded-lg border border-l-[3px] bg-white", statusStyles[status].border)}>
     <div className="grid items-center gap-4 p-4 sm:p-5 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]">
       <div className="flex min-w-0 items-center gap-3"><span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={request.providerImage} alt={request.provider} fill sizes="48px" className="object-cover" /></span><div className="min-w-0"><h2 className="truncate font-black">{request.service}</h2><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><User className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">com </span><strong className="text-foreground/75">{request.provider}</strong></p><p className="mt-1 flex items-center gap-1 text-xs"><CalendarDays className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span><span className="sr-only">Quando </span><span className="font-bold">{request.date}</span><span className="text-muted-foreground"> - {request.time}</span></span></p><p className="mt-1 flex items-center gap-1 text-xs"><MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span className="sr-only">Onde </span><span className="font-bold">{request.location}</span></p></div></div>
       <div className="flex min-w-0 items-stretch gap-3 border-t py-3 md:border-l md:border-t-0 md:px-5 md:py-0"><span className="relative w-20 shrink-0 self-stretch overflow-hidden rounded-md border bg-muted"><Image src={request.photo} alt="" fill sizes="80px" className="object-cover" /></span><div className="flex min-w-0 flex-col justify-center"><p className="line-clamp-2 text-sm text-muted-foreground">{request.description}</p><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Clock3 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">Duração </span><strong className="text-foreground/75">{request.duration}</strong></p><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Banknote className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">Preço </span><strong className="text-foreground/75">{request.price}</strong></p></div></div>
     </div>
-    <div className="flex min-h-[41px] items-center gap-2 border-t bg-[#f7faf7] px-4 py-3 text-xs sm:px-5"><span className={cn("rounded-full px-2.5 py-1 text-[9px] font-black uppercase", statusStyles[status].badge)}>{status}</span><span className="text-muted-foreground" aria-hidden="true">·</span><p className="font-semibold">{request.negotiations} {request.negotiations === 1 ? "Negociação" : "Negociações"}</p><button type="button" className="ml-auto grid h-8 w-8 shrink-0 place-items-center rounded-full border bg-white hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" aria-label="Histórico de negociações"><History className="h-4 w-4" /></button></div>
+    <div className="flex min-h-[41px] flex-wrap items-center gap-2 border-t bg-[#f7faf7] px-4 py-3 text-xs sm:px-5"><span className={cn("rounded-full px-2.5 py-1 text-[9px] font-black uppercase", statusStyles[status].badge)}>{status}</span><span className="text-muted-foreground" aria-hidden="true">·</span><p className="font-semibold">{request.negotiations} {request.negotiations === 1 ? "Negociação" : "Negociações"}</p><HistoryButton open={historyOpen} onClick={() => setHistoryOpen((open) => !open)} className="ml-auto" /></div>
+    {historyOpen && <HistoryTimeline events={request.history} tone={status === "Cancelada" ? "danger" : status === "Concluída" ? "success" : "default"} />}
   </article>;
 }

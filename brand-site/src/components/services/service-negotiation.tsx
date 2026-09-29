@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 
 import type { Service } from "@/types/service";
 
-export function ServiceNegotiation({ service }: { service: Service }) {
+export function ServiceNegotiation({ service, selectedDate, searchLocation }: { service: Service; selectedDate: string; searchLocation: string }) {
   const [editingValue, setEditingValue] = useState(false);
   const [proposalValue, setProposalValue] = useState("");
 
@@ -32,16 +33,16 @@ export function ServiceNegotiation({ service }: { service: Service }) {
                   className="h-11 w-full rounded-md border bg-[#fbfcf9] pl-10 pr-3 text-xl font-black text-foreground outline-none placeholder:font-normal placeholder:text-muted-foreground focus:border-foreground"
                 />
               </div>
-            ) : <p className="mt-1 text-3xl font-black text-foreground">R$ {service.price}/Hora</p>}
+            ) : <><p className="mt-1 text-3xl font-black text-foreground">{service.priceLabel}</p><p className="mt-1 text-xs text-muted-foreground">{service.priceDetail}</p></>}
           </div>
-          <button type="button" onClick={() => { setProposalValue(""); setEditingValue(true); }} className="mt-5 grid h-9 w-9 shrink-0 place-items-center rounded-full border bg-white text-foreground transition hover:bg-muted" aria-label="Editar valor ofertado">
+          <button type="button" onClick={() => setEditingValue(true)} className="mt-5 grid h-9 w-9 shrink-0 place-items-center rounded-full border bg-white text-foreground transition hover:bg-muted" aria-label="Propor outro valor">
             <Pencil className="h-4 w-4" />
           </button>
         </div>
 
-        <button type="button" className="mt-5 h-12 w-full rounded-md bg-foreground px-4 text-sm font-bold text-white transition hover:opacity-90">
+        <Link href={{ pathname: `/negociacao/${service.slug}`, query: { data: selectedDate, local: searchLocation, ...(Number(proposalValue) > 0 ? { valor: proposalValue } : {}) } }} className="mt-5 flex h-12 w-full items-center justify-center rounded-md bg-foreground px-4 text-sm font-bold text-white transition hover:opacity-90">
           Negociar
-        </button>
+        </Link>
         <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">O valor será combinado com o prestador antes da confirmação.</p>
       </div>
     </aside>

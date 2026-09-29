@@ -85,14 +85,15 @@ export function AccountMenu() {
             <ClipboardList className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             Contratados
           </Link>
-          <button
-            type="button"
+          <Link
+            href="/prestados"
+            onClick={() => setOpen(false)}
             className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             role="menuitem"
           >
             <Hammer className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             Prestados
-          </button>
+          </Link>
           <Link
             href="/prestador"
             onClick={() => setOpen(false)}
