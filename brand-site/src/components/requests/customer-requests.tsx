@@ -4,12 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import {
-  CalendarDays, Check, ChevronRight, CircleUserRound,
-  Clock3, Compass, Heart, History, House, MapPin, MessageCircle, User, Wrench,
+  Banknote, CalendarDays, Check, CircleUserRound,
+  Clock3, Compass, Heart, History, House, MapPin, User, Wrench,
 } from "lucide-react";
 
 import { MarketplaceHeader } from "@/components/layout/marketplace-header";
-import { ReviewPhotoStack } from "@/components/services/review-photo-stack";
 import { cn } from "@/lib/utils";
 
 type RequestStatus = "Cancelada" | "Em andamento" | "Concluída";
@@ -26,7 +25,9 @@ const customerRequests = [
     location: "Saúde, São Paulo",
     price: "R$ 180",
     negotiations: 6,
-    photos: ["/images/limpeza.jpg", "/images/montagem.jpg"] as [string, string],
+    photo: "/images/limpeza.jpg",
+    description: "Apartamento com dois quartos, sala e cozinha. Incluir banheiros e área de serviço. O piso da sala precisa de atenção extra e os armários da cozinha estão com gordura acumulada.",
+    duration: "02:20",
   },
   {
     id: 2,
@@ -39,7 +40,9 @@ const customerRequests = [
     location: "Vila Mariana, São Paulo",
     price: "R$ 150",
     negotiations: 3,
-    photos: ["/images/eletrica.jpg", "/images/hidraulica.jpg"] as [string, string],
+    photo: "/images/eletrica.jpg",
+    description: "Troca de tomadas e revisão do quadro de luz da sala. Também preciso verificar o disjuntor que desarma quando o ar-condicionado liga junto com o chuveiro.",
+    duration: "00:30",
   },
   {
     id: 3,
@@ -52,7 +55,9 @@ const customerRequests = [
     location: "Aclimação, São Paulo",
     price: "R$ 120",
     negotiations: 2,
-    photos: ["/images/montagem.jpg", "/images/pintura.jpg"] as [string, string],
+    photo: "/images/montagem.jpg",
+    description: "Guarda-roupa de três portas e uma estante pequena. As peças estão todas na sala e o manual de montagem está separado em um envelope.",
+    duration: "01:45",
   },
 ];
 
@@ -94,10 +99,9 @@ export function CustomerRequests() {
 function RequestCard({ request, accepted }: { request: (typeof customerRequests)[number]; accepted: boolean }) {
   const status = accepted ? "Concluída" : request.status;
   return <article className={cn("overflow-hidden rounded-lg border border-l-[3px] bg-white", statusStyles[status].border)}>
-    <div className="grid items-stretch gap-4 p-4 sm:p-5 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)_minmax(0,1fr)]">
-      <div className="flex min-w-0 gap-3"><span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={request.providerImage} alt={request.provider} fill sizes="48px" className="object-cover" /></span><div className="min-w-0"><h2 className="truncate font-black">{request.service}</h2><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><User className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">com </span><strong className="text-foreground/75">{request.provider}</strong></p><p className="mt-1 flex items-center gap-1 text-xs"><CalendarDays className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span><span className="sr-only">Quando </span><span className="font-bold">{request.date}</span><span className="text-muted-foreground"> - {request.time}</span></span></p><p className="mt-1 flex items-center gap-1 text-xs"><MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span className="sr-only">Onde </span><span className="font-bold">{request.location}</span></p></div></div>
-      <div className="flex min-w-0 items-center border-y py-3 md:border-x md:border-y-0 md:px-5 md:py-1" aria-label="Fotos enviadas na triagem"><ReviewPhotoStack photos={request.photos} size={48} /></div>
-      <div className="flex min-w-0 items-center justify-between gap-3 md:flex-col md:justify-center md:text-center"><strong className="text-lg font-black">{request.price}</strong><div className="flex gap-2 md:mt-3 md:justify-center"><button type="button" className="grid h-9 w-9 place-items-center rounded-full border hover:bg-muted" aria-label={`Conversar com ${request.provider}`}><MessageCircle className="h-4 w-4" /></button><button type="button" className="grid h-9 w-9 place-items-center rounded-full border hover:bg-muted" aria-label="Ver detalhes"><ChevronRight className="h-4 w-4" /></button></div></div>
+    <div className="grid items-center gap-4 p-4 sm:p-5 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]">
+      <div className="flex min-w-0 items-center gap-3"><span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={request.providerImage} alt={request.provider} fill sizes="48px" className="object-cover" /></span><div className="min-w-0"><h2 className="truncate font-black">{request.service}</h2><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><User className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">com </span><strong className="text-foreground/75">{request.provider}</strong></p><p className="mt-1 flex items-center gap-1 text-xs"><CalendarDays className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span><span className="sr-only">Quando </span><span className="font-bold">{request.date}</span><span className="text-muted-foreground"> - {request.time}</span></span></p><p className="mt-1 flex items-center gap-1 text-xs"><MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span className="sr-only">Onde </span><span className="font-bold">{request.location}</span></p></div></div>
+      <div className="flex min-w-0 items-stretch gap-3 border-t py-3 md:border-l md:border-t-0 md:px-5 md:py-0"><span className="relative w-20 shrink-0 self-stretch overflow-hidden rounded-md border bg-muted"><Image src={request.photo} alt="" fill sizes="80px" className="object-cover" /></span><div className="flex min-w-0 flex-col justify-center"><p className="line-clamp-2 text-sm text-muted-foreground">{request.description}</p><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Clock3 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">Duração </span><strong className="text-foreground/75">{request.duration}</strong></p><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Banknote className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">Preço </span><strong className="text-foreground/75">{request.price}</strong></p></div></div>
     </div>
     <div className="flex min-h-[41px] items-center gap-2 border-t bg-[#f7faf7] px-4 py-3 text-xs sm:px-5"><span className={cn("rounded-full px-2.5 py-1 text-[9px] font-black uppercase", statusStyles[status].badge)}>{status}</span><span className="text-muted-foreground" aria-hidden="true">·</span><p className="font-semibold">{request.negotiations} {request.negotiations === 1 ? "Negociação" : "Negociações"}</p><button type="button" className="ml-auto grid h-8 w-8 shrink-0 place-items-center rounded-full border bg-white hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" aria-label="Histórico de negociações"><History className="h-4 w-4" /></button></div>
   </article>;

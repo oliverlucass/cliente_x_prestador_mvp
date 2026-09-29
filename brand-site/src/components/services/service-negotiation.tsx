@@ -40,7 +40,7 @@ export function ServiceNegotiation({ service }: { service: Service }) {
         </div>
 
         <button type="button" className="mt-5 h-12 w-full rounded-md bg-foreground px-4 text-sm font-bold text-white transition hover:opacity-90">
-          Enviar solicitacao
+          Negociar
         </button>
         <p className="mt-3 text-center text-xs leading-5 text-muted-foreground">O valor será combinado com o prestador antes da confirmação.</p>
       </div>

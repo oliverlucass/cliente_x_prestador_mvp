@@ -2,35 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeCheck, BriefcaseBusiness, ChevronDown, CircleHelp, ClipboardList, LogOut, Settings } from "lucide-react";
+import { BadgeCheck, BriefcaseBusiness, ChevronDown, CircleHelp, ClipboardList, Hammer, LogOut, Settings } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-
-function RealizadosIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-4 w-4 shrink-0 text-muted-foreground"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="16.5" cy="16.75" r="6.5" />
-      <path d="M16.5 13.4v3.7l2.6 1.5" />
-      <rect
-        x="1.5"
-        y="4.5"
-        width="14"
-        height="11.5"
-        rx="2"
-        className="fill-white transition-colors group-hover:fill-[#eef3e9]"
-      />
-      <path d="M12.5 16V3.75a1.8 1.8 0 0 0-1.8-1.8H7.3A1.8 1.8 0 0 0 5.5 3.75V16" />
-    </svg>
-  );
-}
 
 export function AccountMenu() {
   const [open, setOpen] = useState(false);
@@ -110,15 +83,15 @@ export function AccountMenu() {
             role="menuitem"
           >
             <ClipboardList className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-            Minhas solicitações
+            Contratados
           </Link>
           <button
             type="button"
-            className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm font-medium text-foreground transition-colors hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             role="menuitem"
           >
-            <RealizadosIcon />
-            Realizados
+            <Hammer className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            Prestados
           </button>
           <Link
             href="/prestador"
