@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import {
-  Banknote, CalendarDays, Check, CircleUserRound,
+  Banknote, CalendarDays, CircleUserRound,
   Clock3, Compass, Heart, House, MapPin, User, Wrench,
 } from "lucide-react";
 
@@ -84,23 +84,19 @@ const statusStyles: Record<RequestStatus, { badge: string; border: string }> = {
   "Concluída": { badge: "bg-[#dcf0e7] text-[#1f644d]", border: "border-l-[#1f644d]" },
 };
 
-export function CustomerRequests() {
-  const [accepted, setAccepted] = useState(false);
+const requestsInProgress = customerRequests.filter((request) => request.status === "Em andamento");
+const otherRequests = customerRequests.filter((request) => request.status !== "Em andamento");
 
+export function CustomerRequests() {
   return <div className="min-h-screen bg-[#f6f7f3] pb-20 md:pb-0">
     <MarketplaceHeader />
 
     <div className="mx-auto max-w-[1240px] px-4 py-7 sm:px-6 md:py-10 lg:px-8">
       <div><p className="text-[10px] font-black uppercase text-[#527637]">Seus serviços</p><h1 className="mt-1 text-[30px] font-black leading-tight sm:text-[38px]">Minhas solicitações</h1><p className="mt-2 text-sm text-muted-foreground">Acompanhe cada conversa até o serviço ficar concluído.</p></div>
 
-      {!accepted ? <section className="mt-7 grid overflow-hidden rounded-lg border bg-white md:grid-cols-[1fr_auto]">
-        <div className="flex gap-4 p-5 sm:p-6"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#ffe2da] text-[#9f3825]"><Clock3 className="h-5 w-5" /></span><div><p className="text-[10px] font-black uppercase text-[#9f3825]">Uma resposta nova</p><h2 className="mt-1 text-lg font-black">Ana sugeriu sábado às 09:00</h2><p className="mt-1 text-sm text-muted-foreground">Limpeza completa da sua casa · R$ 180</p></div></div>
-        <div className="flex items-center gap-2 border-t p-4 md:border-l md:border-t-0"><button type="button" className="h-10 rounded-md px-4 text-sm font-bold text-muted-foreground hover:bg-muted">Outro horário</button><button type="button" onClick={() => setAccepted(true)} className="h-10 rounded-md bg-foreground px-5 text-sm font-bold text-white">Confirmar</button></div>
-      </section> : <section className="mt-7 flex items-center gap-4 rounded-lg bg-[#dcf0e7] p-5 text-[#1f644d]"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white"><Check className="h-5 w-5" /></span><div><h2 className="font-black">Horário confirmado</h2><p className="mt-0.5 text-sm">O serviço com Ana já entrou na agenda.</p></div></section>}
-
-      <div className="mt-8 mb-8 border-b" />
-
-      <div className="grid gap-4">{customerRequests.map((request) => <RequestCard key={request.id} request={request} accepted={accepted && request.id === 1} />)}</div>
+      <div className="mt-7 grid gap-4">{requestsInProgress.map((request) => <RequestCard key={request.id} request={request} />)}</div>
+      {requestsInProgress.length > 0 && otherRequests.length > 0 && <div className="my-8 border-b" />}
+      <div className="grid gap-4">{otherRequests.map((request) => <RequestCard key={request.id} request={request} />)}</div>
     </div>
 
     <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-white/95 px-1 pt-2 backdrop-blur md:hidden" aria-label="Navegação principal">
@@ -113,9 +109,9 @@ export function CustomerRequests() {
   </div>;
 }
 
-function RequestCard({ request, accepted }: { request: (typeof customerRequests)[number]; accepted: boolean }) {
+function RequestCard({ request }: { request: (typeof customerRequests)[number] }) {
   const [historyOpen, setHistoryOpen] = useState(false);
-  const status = accepted ? "Concluída" : request.status;
+  const status = request.status;
   return <article className={cn("overflow-hidden rounded-lg border border-l-[3px] bg-white", statusStyles[status].border)}>
     <div className="grid items-center gap-4 p-4 sm:p-5 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]">
       <div className="flex min-w-0 items-center gap-3"><span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={request.providerImage} alt={request.provider} fill sizes="48px" className="object-cover" /></span><div className="min-w-0"><h2 className="truncate font-black">{request.service}</h2><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><User className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">com </span><strong className="text-foreground/75">{request.provider}</strong></p><p className="mt-1 flex items-center gap-1 text-xs"><CalendarDays className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span><span className="sr-only">Quando </span><span className="font-bold">{request.date}</span><span className="text-muted-foreground"> - {request.time}</span></span></p><p className="mt-1 flex items-center gap-1 text-xs"><MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span className="sr-only">Onde </span><span className="font-bold">{request.location}</span></p></div></div>

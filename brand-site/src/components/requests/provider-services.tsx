@@ -4,13 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import {
-  Banknote, CalendarDays, Check, CircleUserRound, Clock3, Compass,
-  Hammer, House, MapPin, User, Wrench, X,
+  Banknote, CalendarDays, CircleUserRound, Clock3, Compass,
+  Hammer, House, MapPin, User, Wrench,
 } from "lucide-react";
 
 import { MarketplaceHeader } from "@/components/layout/marketplace-header";
 import { HistoryButton } from "@/components/requests/history-button";
-import { createHistoryEvent, HistoryTimeline, type HistoryEvent } from "@/components/requests/history-timeline";
+import { HistoryTimeline, type HistoryEvent } from "@/components/requests/history-timeline";
 import { cn } from "@/lib/utils";
 
 type ServiceStatus = "Nova" | "Confirmado" | "Em andamento" | "Concluído" | "Recusado";
@@ -97,32 +97,19 @@ const statusStyles: Record<ServiceStatus, { badge: string; border: string }> = {
   Recusado: { badge: "bg-[#ffe2da] text-[#9f3825]", border: "border-l-[#9f3825]" },
 };
 
+const servicesInProgress = initialServices.filter((service) => service.status === "Em andamento");
+const otherServices = initialServices.filter((service) => service.status !== "Em andamento");
+
 export function ProviderServices() {
-  const [services, setServices] = useState(initialServices);
-
-  const updateStatus = (id: number, status: ServiceStatus, title: string, detail: string) => {
-    const event = createHistoryEvent(title, detail);
-    setServices((current) => current.map((service) => service.id === id
-      ? { ...service, status, time: status === "Confirmado" ? "18:30" : service.time, history: [...service.history, event] }
-      : service));
-  };
-
-  const featured = services[0];
-
   return <div className="min-h-screen bg-[#f6f7f3] pb-20 md:pb-0">
     <MarketplaceHeader />
 
     <div className="mx-auto max-w-[1240px] px-4 py-7 sm:px-6 md:py-10 lg:px-8">
       <div><p className="text-[10px] font-black uppercase text-[#527637]">Seus serviços</p><h1 className="mt-1 text-[30px] font-black leading-tight sm:text-[38px]">Serviços prestados</h1><p className="mt-2 text-sm text-muted-foreground">Acompanhe os pedidos dos seus clientes até a conclusão de cada serviço.</p></div>
 
-      {featured.status === "Nova" ? <section className="mt-7 grid overflow-hidden rounded-lg border bg-white md:grid-cols-[1fr_auto]">
-        <div className="flex gap-4 p-5 sm:p-6"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#ffe2da] text-[#9f3825]"><Clock3 className="h-5 w-5" /></span><div><p className="text-[10px] font-black uppercase text-[#9f3825]">Nova solicitação</p><h2 className="mt-1 text-lg font-black">Mariana quer instalar 3 luminárias</h2><p className="mt-1 text-sm text-muted-foreground">30 de setembro · 18:30 sugerido · R$ 150</p></div></div>
-        <div className="flex items-center gap-2 border-t p-4 md:border-l md:border-t-0"><button type="button" onClick={() => updateStatus(1, "Recusado", "Solicitação recusada", "Carlos recusou o pedido de Mariana.")} className="h-10 rounded-md px-4 text-sm font-bold text-muted-foreground hover:bg-muted">Recusar</button><button type="button" onClick={() => updateStatus(1, "Confirmado", "Pedido aceito", "Carlos aceitou a instalação das luminárias.")} className="h-10 rounded-md bg-foreground px-5 text-sm font-bold text-white">Aceitar pedido</button></div>
-      </section> : <section className={cn("mt-7 flex items-center gap-4 rounded-lg p-5", featured.status === "Recusado" ? "bg-[#ffe2da] text-[#9f3825]" : "bg-[#dcf0e7] text-[#1f644d]")}><span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white">{featured.status === "Recusado" ? <X className="h-5 w-5" /> : <Check className="h-5 w-5" />}</span><div><h2 className="font-black">{featured.status === "Recusado" ? "Solicitação recusada" : "Pedido aceito"}</h2><p className="mt-0.5 text-sm">{featured.status === "Recusado" ? "O pedido de Mariana foi encerrado." : "O serviço de Mariana foi confirmado e entrou na sua lista."}</p></div></section>}
-
-      <div className="mb-8 mt-8 border-b" />
-
-      <div className="grid gap-4">{services.map((service) => <ProvidedServiceCard key={service.id} service={service} />)}</div>
+      <div className="mt-7 grid gap-4">{servicesInProgress.map((service) => <ProvidedServiceCard key={service.id} service={service} />)}</div>
+      {servicesInProgress.length > 0 && otherServices.length > 0 && <div className="my-8 border-b" />}
+      <div className="grid gap-4">{otherServices.map((service) => <ProvidedServiceCard key={service.id} service={service} />)}</div>
     </div>
 
     <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-white/95 px-1 pt-2 backdrop-blur md:hidden" aria-label="Navegação principal">
