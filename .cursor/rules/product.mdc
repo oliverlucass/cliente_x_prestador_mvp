@@ -1,0 +1,45 @@
+---
+description: Product context for Fechô, the local services marketplace
+alwaysApply: true
+---
+
+# Fechô
+
+Fast, direct marketplace. A cliente with a demand reaches a prestador easily. Together they negotiate, agree on a value, and complete the service. Tagline: **Achou, conversou, fechô.** UI copy is Brazilian Portuguese (`pt-BR`). The app lives in `brand-site/`.
+
+Either side can start. Publishing is how the other side finds you: the cliente publishes a demand, or the prestador publishes their trade.
+
+## Cliente
+
+1. **Publish the demand.** Fill the form with what the job needs and post it. Prestadores who fit see the open posting, contact the cliente, and negotiate.
+2. **Contact a listed prestador.** Do not post. Search prestadores already on the platform, open one, and negotiate through a form.
+
+## Prestador
+
+1. **Answer a published demand.** Browse jobs posted by clientes, open one that matches the trade, contact the cliente through a form, negotiate, and do the work.
+2. **Publish yourself.** Clientes can search that prestador and send a demand that fits the trade.
+
+One person can use both sides. Account menu: Contratados (`/solicitacoes`), Prestados (`/prestados`), Área do prestador (`/prestador`).
+
+## Close
+
+Negotiation ends when both agree on the value. Closing the deal debits the cliente and holds that money in the prestador's wallet until the service is finished. Completion releases it to the prestador. Both flows end there.
+
+The agreed value comes from the conversation, not from a public auction. Contact stays inside the product, through a form.
+
+## What is on screen today
+
+The prototype mostly shows cliente flow 2 and prestador flow 2: search listed professionals, open a listing, send a job brief. Cliente-published demands, prestador browsing those demands, wallet hold, and release on completion are the product target and are not built yet.
+
+| Route | Role |
+| --- | --- |
+| `/` | Search prestadores: categories, distance, date, list or map, listing sheet |
+| `/negociacao/[slug]` | Form to contact that prestador: address, photos, schedule, offer |
+| `/solicitacoes` | Cliente: hired jobs and timeline |
+| `/prestados` | Prestador: incoming and active jobs |
+| `/prestador` | Workspace: overview, requests, agenda, listings, availability |
+| `/login`, `/cadastro` | Account screens only; no real auth yet |
+
+Frontend prototype with mock data in `brand-site/src/data/mock/services.ts`. State is local React state and is not persisted. Login, payments, wallet hold, real chat, geolocation, and a live map are not built. The map is a visual stand-in.
+
+When adding behavior, keep both entry paths, form-based contact, a negotiated value, and hold-until-done payment. Match the voice: direct, informal, short. Lime `#c9f24a` on deep green `#103f35` is the brand pair.
