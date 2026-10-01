@@ -14,9 +14,14 @@ import type { Service } from "@/types/service";
 type FormValues = {
   title: string;
   description: string;
-  neighborhood: string;
+  cep: string;
+  state: string;
   city: string;
+  neighborhood: string;
+  complement: string;
+  number: string;
   place: string;
+  observation: string;
   materials: string;
   date: string;
   period: string;
@@ -27,22 +32,43 @@ type FormValues = {
 type Photo = { id: string; name: string; preview: string };
 
 const inputClass = "mt-2 h-11 w-full rounded-md border bg-white px-3 text-sm text-foreground outline-none transition focus:border-[#357258] focus:ring-2 focus:ring-[#dcebdc]";
+
+const brazilianStates = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"];
+const periods = ["A combinar", "Manhã", "Tarde", "Noite"];
+const urgencies = ["Flexível", "Nos próximos dias", "Urgente"];
+
+function formatCep(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  return digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
+}
+
+function locationSummary(values: FormValues) {
+  const cityAndState = [values.city, values.state].filter((part) => part.trim()).join(" - ");
+  return [values.neighborhood, values.number.trim() && `nº ${values.number.trim()}`, values.complement.trim(), cityAndState].filter(Boolean).join(", ");
+}
 const textareaClass = "mt-2 w-full resize-y rounded-md border bg-white px-3 py-3 text-sm leading-6 text-foreground outline-none transition focus:border-[#357258] focus:ring-2 focus:ring-[#dcebdc]";
 
 export function NegotiationForm({ service, initialDate, initialOffer, initialLocation }: { service: Service; initialDate: string; initialOffer: string; initialLocation: string }) {
   const [initialNeighborhood, ...initialCityParts] = initialLocation.split(",").map((part) => part.trim());
+  const city = initialCityParts.join(", ") || service.city;
   const [values, setValues] = useState<FormValues>({
     title: "",
     description: "",
+    cep: "",
+    state: city === "São Paulo" ? "SP" : "",
+    city,
     neighborhood: initialNeighborhood,
-    city: initialCityParts.join(", ") || service.city,
+    complement: "",
+    number: "",
     place: "",
+    observation: "",
     materials: "",
     date: initialDate,
     period: "A combinar",
     urgency: "Flexível",
     offer: initialOffer,
   });
+  const [noComplement, setNoComplement] = useState(false);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [photoError, setPhotoError] = useState("");
   const [formError, setFormError] = useState("");
@@ -88,7 +114,7 @@ export function NegotiationForm({ service, initialDate, initialOffer, initialLoc
   function review(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (readingPhotos) return;
-    if (values.title.trim().length < 5 || values.description.trim().length < 20 || !values.neighborhood.trim() || !values.city.trim()) {
+    if (values.title.trim().length < 5 || values.description.trim().length < 20 || !values.neighborhood.trim() || !values.city.trim() || !values.state.trim() || !values.number.trim() || !/^\d{5}-\d{3}$/.test(values.cep)) {
       setFormError("Preencha título, descrição e localização com informações válidas.");
       return;
     }
@@ -109,7 +135,7 @@ export function NegotiationForm({ service, initialDate, initialOffer, initialLoc
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#dcf0e7] text-[#1f644d]"><Check className="h-7 w-7" /></span>
         <h1 className="mt-5 text-[30px] font-black leading-tight sm:text-[38px]">Prévia concluída</h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">Você preparou o pedido para {service.provider}. Esta versão ainda não envia a solicitação ao prestador.</p>
-        <div className="mt-8 border-y py-5 text-left"><p className="text-xs font-bold uppercase text-[#527637]">Seu pedido</p><h2 className="mt-2 text-lg font-black">{values.title}</h2><p className="mt-1 text-sm text-muted-foreground">{values.neighborhood}, {values.city} · {formattedDate}</p></div>
+        <div className="mt-8 border-y py-5 text-left"><p className="text-xs font-bold uppercase text-[#527637]">Seu pedido</p><h2 className="mt-2 text-lg font-black">{values.title}</h2><p className="mt-1 text-sm text-muted-foreground">{locationSummary(values)} · {formattedDate}</p></div>
         <div className="mt-7 flex flex-wrap justify-center gap-3"><button type="button" onClick={() => setStep("form")} className="h-11 rounded-md border bg-white px-5 text-sm font-bold hover:bg-muted">Editar pedido</button><Link href="/" className="flex h-11 items-center rounded-md bg-foreground px-5 text-sm font-bold text-white">Voltar à vitrine</Link></div>
       </div> : <>
         <div className="mt-7"><p className="text-[10px] font-black uppercase text-[#527637]">Nova negociação</p><h1 className="mt-1 text-[30px] font-black leading-tight sm:text-[38px]">{step === "review" ? "Revise seu pedido" : "Conte o que você precisa"}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{step === "review" ? "Confira os detalhes antes de concluir a prévia." : `Prepare os detalhes que ${service.provider} precisará para avaliar o trabalho e combinar os próximos passos.`}</p></div>
@@ -133,22 +159,43 @@ export function NegotiationForm({ service, initialDate, initialOffer, initialLoc
             </section>
 
             <section className="border-b py-8"><SectionTitle number="02" title="Local e condições" />
-              <div className="mt-6 grid gap-4 sm:grid-cols-2"><div><label htmlFor="request-neighborhood" className="text-sm font-bold">Bairro ou região <span className="text-[#aa4d3b]">*</span></label><input id="request-neighborhood" required value={values.neighborhood} onChange={(event) => update("neighborhood", event.target.value)} placeholder="Ex.: Vila Mariana" className={inputClass} /></div><div><label htmlFor="request-city" className="text-sm font-bold">Cidade <span className="text-[#aa4d3b]">*</span></label><input id="request-city" required value={values.city} onChange={(event) => update("city", event.target.value)} className={inputClass} /></div></div>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div><label htmlFor="request-cep" className="text-sm font-bold">CEP <span className="text-[#aa4d3b]">*</span></label><input id="request-cep" name="cep" required inputMode="numeric" autoComplete="postal-code" maxLength={9} pattern="\d{5}-\d{3}" value={values.cep} onChange={(event) => update("cep", formatCep(event.target.value))} placeholder="00000-000" className={inputClass} /></div>
+                <div><label htmlFor="request-state" className="text-sm font-bold">Estado <span className="text-[#aa4d3b]">*</span></label><select id="request-state" name="state" required autoComplete="address-level1" value={values.state} onChange={(event) => update("state", event.target.value)} className={inputClass}><option value="">Selecione</option>{brazilianStates.map((state) => <option key={state} value={state}>{state}</option>)}</select></div>
+                <div><label htmlFor="request-city" className="text-sm font-bold">Cidade <span className="text-[#aa4d3b]">*</span></label><input id="request-city" name="city" required autoComplete="address-level2" value={values.city} onChange={(event) => update("city", event.target.value)} className={inputClass} /></div>
+                <div><label htmlFor="request-neighborhood" className="text-sm font-bold">Bairro ou região <span className="text-[#aa4d3b]">*</span></label><input id="request-neighborhood" name="neighborhood" required autoComplete="address-level3" value={values.neighborhood} onChange={(event) => update("neighborhood", event.target.value)} placeholder="Ex.: Vila Mariana" className={inputClass} /></div>
+                <div><label htmlFor="request-number" className="text-sm font-bold">Número <span className="text-[#aa4d3b]">*</span></label><input id="request-number" name="number" required maxLength={20} value={values.number} onChange={(event) => update("number", event.target.value)} placeholder="Ex.: 120" className={inputClass} /></div>
+                <div>
+                  <label htmlFor="request-complement" className="text-sm font-bold">Complemento</label>
+                  <input id="request-complement" name="complement" autoComplete="address-line2" maxLength={40} disabled={noComplement} value={values.complement} onChange={(event) => update("complement", event.target.value)} placeholder="Ex.: Apto 42" className={`${inputClass} disabled:cursor-not-allowed disabled:bg-[#f3f4f1] disabled:text-muted-foreground`} />
+                  <label htmlFor="request-no-complement" className="mt-2 flex w-fit cursor-pointer items-center gap-2 text-sm font-medium"><input id="request-no-complement" name="no-complement" type="checkbox" checked={noComplement} onChange={(event) => { const checked = event.target.checked; setNoComplement(checked); if (checked) update("complement", ""); }} className="h-4 w-4 accent-[#357258] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#357258]" />Sem complemento</label>
+                </div>
+              </div>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2"><div><label htmlFor="request-place" className="text-sm font-bold">Tipo de local <span className="text-[#aa4d3b]">*</span></label><select id="request-place" required value={values.place} onChange={(event) => update("place", event.target.value)} className={inputClass}><option value="">Selecione</option><option>Residência</option><option>Empresa</option><option>Área externa</option><option>Outro local</option></select></div><div><label htmlFor="request-observation" className="text-sm font-bold">Observação</label><input id="request-observation" name="observation" maxLength={120} value={values.observation} onChange={(event) => update("observation", event.target.value)} placeholder="Ex.: Portão azul, interfone 12" className={inputClass} /></div><div><label htmlFor="request-materials" className="text-sm font-bold">Materiais e equipamentos</label><select id="request-materials" value={values.materials} onChange={(event) => update("materials", event.target.value)} className={inputClass}><option value="">A combinar</option><option>Já tenho o necessário</option><option>Preciso que o prestador leve</option></select></div></div>
               <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground"><MapPin className="h-3.5 w-3.5" />O endereço exato pode ser combinado depois.</p>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2"><div><label htmlFor="request-place" className="text-sm font-bold">Tipo de local <span className="text-[#aa4d3b]">*</span></label><select id="request-place" required value={values.place} onChange={(event) => update("place", event.target.value)} className={inputClass}><option value="">Selecione</option><option>Residência</option><option>Empresa</option><option>Área externa</option><option>Outro local</option></select></div><div><label htmlFor="request-materials" className="text-sm font-bold">Materiais e equipamentos</label><select id="request-materials" value={values.materials} onChange={(event) => update("materials", event.target.value)} className={inputClass}><option value="">A combinar</option><option>Já tenho o necessário</option><option>Preciso que o prestador leve</option></select></div></div>
             </section>
 
             <section className="border-b py-8"><SectionTitle number="03" title="Quando e por quanto" />
-              <div className="mt-6 grid gap-4 sm:grid-cols-2"><div><label htmlFor="request-date" className="text-sm font-bold">Data preferida</label><input id="request-date" type="date" min={new Date().toLocaleDateString("sv-SE")} value={values.date} onChange={(event) => update("date", event.target.value)} className={inputClass} /></div><div><label htmlFor="request-period" className="text-sm font-bold">Período</label><select id="request-period" value={values.period} onChange={(event) => update("period", event.target.value)} className={inputClass}><option>A combinar</option><option>Manhã</option><option>Tarde</option><option>Noite</option></select></div></div>
-              <div className="mt-5 grid gap-4 sm:grid-cols-2"><div><label htmlFor="request-urgency" className="text-sm font-bold">Prazo</label><select id="request-urgency" value={values.urgency} onChange={(event) => update("urgency", event.target.value)} className={inputClass}><option>Flexível</option><option>Nos próximos dias</option><option>Urgente</option></select></div><div><label htmlFor="request-offer" className="text-sm font-bold">Valor que pretende pagar</label><div className="relative"><span className="absolute left-3 top-[30px] text-sm font-bold text-muted-foreground">R$</span><input id="request-offer" type="number" min="1" step="0.01" inputMode="decimal" value={values.offer} onChange={(event) => update("offer", event.target.value)} placeholder="A combinar" className={`${inputClass} pl-10`} /></div></div></div>
-              <p className="mt-2 text-xs text-muted-foreground">O valor final depende da conversa com {service.provider.split(" ")[0]}.</p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2"><div><label htmlFor="request-date" className="text-sm font-bold">Data preferida</label><input id="request-date" type="date" min={new Date().toLocaleDateString("sv-SE")} value={values.date} onChange={(event) => update("date", event.target.value)} className={inputClass} /></div></div>
+              <ChoiceGroup className="mt-5" legend="Período" name="period" value={values.period} options={periods} onChange={(period) => update("period", period)} />
+              <ChoiceGroup className="mt-5" legend="Prazo" name="urgency" value={values.urgency} options={urgencies} onChange={(urgency) => update("urgency", urgency)} />
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="request-offer" className="text-sm font-bold">Valor que pretende pagar</label>
+                  <div className="relative mt-2">
+                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-bold text-muted-foreground">R$</span>
+                    <input id="request-offer" type="number" min="1" step="0.01" inputMode="decimal" value={values.offer} onChange={(event) => update("offer", event.target.value)} placeholder="A combinar" className="h-11 w-full rounded-md border bg-white pl-10 pr-3 text-sm text-foreground outline-none transition focus:border-[#357258] focus:ring-2 focus:ring-[#dcebdc]" />
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">O valor final depende da conversa com {service.provider.split(" ")[0]}.</p>
+                </div>
+              </div>
             </section>
 
             {formError && <p role="alert" className="pt-5 text-sm font-semibold text-[#9f3825]">{formError}</p>}
             <div className="flex flex-col gap-4 pt-7 sm:flex-row sm:items-center sm:justify-between"><p className="flex max-w-md items-start gap-2 text-xs leading-5 text-muted-foreground"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#327054]" />A prévia não gera cobrança. O envio ao prestador ainda não está disponível nesta versão.</p><button type="submit" disabled={readingPhotos} className="flex h-12 items-center justify-center gap-2 rounded-md bg-foreground px-6 text-sm font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">Revisar pedido <ArrowRight className="h-4 w-4" /></button></div>
           </form> : <div className="min-w-0">
             <ReviewSection title="Pedido"><p className="text-lg font-black">{values.title}</p><p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-foreground/75">{values.description}</p>{photos.length > 0 && <div className="mt-4 flex gap-2 overflow-x-auto">{photos.map((photo) => <span key={photo.id} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md"><Image src={photo.preview} alt={photo.name} fill unoptimized sizes="80px" className="object-cover" /></span>)}</div>}</ReviewSection>
-            <ReviewSection title="Local"><p className="text-sm font-semibold">{values.neighborhood}, {values.city}</p><p className="mt-1 text-sm text-muted-foreground">{values.place} · {values.materials || "Materiais a combinar"}</p></ReviewSection>
+            <ReviewSection title="Local"><p className="text-sm font-semibold">{locationSummary(values)}</p><p className="mt-1 text-sm text-muted-foreground">{[values.cep && `CEP ${values.cep}`, values.place, values.observation.trim(), values.materials || "Materiais a combinar"].filter(Boolean).join(" · ")}</p></ReviewSection>
             <ReviewSection title="Agenda e valor"><p className="text-sm font-semibold">{formattedDate} · {values.period}</p><p className="mt-1 text-sm text-muted-foreground">Prazo: {values.urgency} · {values.offer ? `Oferta de R$ ${Number(values.offer).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "Valor a combinar"}</p></ReviewSection>
             <div className="mt-8 flex flex-wrap gap-3"><button type="button" onClick={() => setStep("form")} className="h-11 rounded-md border bg-white px-5 text-sm font-bold hover:bg-muted">Editar</button><button type="button" onClick={() => { setStep("done"); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="h-11 rounded-md bg-foreground px-5 text-sm font-bold text-white hover:opacity-90">Concluir prévia</button></div>
           </div>}
@@ -158,6 +205,19 @@ export function NegotiationForm({ service, initialDate, initialOffer, initialLoc
       </>}
     </div>
   </div>;
+}
+
+function ChoiceGroup({ legend, name, value, options, onChange, className }: { legend: string; name: string; value: string; options: string[]; onChange: (value: string) => void; className?: string }) {
+  return <fieldset className={className}>
+    <legend className="text-sm font-bold">{legend}</legend>
+    <div className="mt-2 flex flex-wrap gap-2">{options.map((option) => {
+      const selected = value === option;
+      return <label key={option} className={`inline-flex h-11 cursor-pointer items-center rounded-md border px-3 text-sm font-semibold transition focus-within:ring-2 focus-within:ring-[#dcebdc] ${selected ? "border-[#357258] bg-[#f1f7ee] text-[#1f644d]" : "bg-white text-foreground hover:bg-muted"}`}>
+        <input type="radio" name={name} value={option} checked={selected} onChange={() => onChange(option)} className="sr-only" />
+        {option}
+      </label>;
+    })}</div>
+  </fieldset>;
 }
 
 function SectionTitle({ number, title }: { number: string; title: string }) {
