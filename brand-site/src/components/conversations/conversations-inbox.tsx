@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowLeft, BadgeCheck, ChevronDown, MapPin, SendHorizontal, Star } from "lucide-react";
 
 import { MarketplaceHeader } from "@/components/layout/marketplace-header";
@@ -118,12 +119,64 @@ const completedNegotiations: Conversation[] = [
   },
 ];
 
-export function ConversationsInbox() {
+function isCompletedConversation(id: string) {
+  return completedNegotiations.some((conversation) => conversation.id === id);
+}
+
+function isKnownConversation(id: string) {
+  return isCompletedConversation(id) || initialConversations.some((conversation) => conversation.id === id);
+}
+
+export function ConversationsInbox({ conversationId = null }: { conversationId?: string | null }) {
+  const router = useRouter();
   const [openConversations, setOpenConversations] = useState(initialConversations);
   const [completedConversations, setCompletedConversations] = useState(completedNegotiations);
-  const [showingCompleted, setShowingCompleted] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [showingCompleted, setShowingCompleted] = useState(
+    () => Boolean(conversationId && isCompletedConversation(conversationId)),
+  );
+  const [activeId, setActiveId] = useState<string | null>(
+    conversationId && isKnownConversation(conversationId) ? conversationId : null,
+  );
   const [draft, setDraft] = useState("");
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const previous = {
+      htmlOverflow: html.style.overflow,
+      bodyOverflow: body.style.overflow,
+    };
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = previous.htmlOverflow;
+      body.style.overflow = previous.bodyOverflow;
+    };
+  }, []);
+
+  const selectConversation = useCallback((id: string) => {
+    if (!isKnownConversation(id)) return;
+
+    const completed = isCompletedConversation(id);
+    setShowingCompleted(completed);
+    setActiveId(id);
+    setDraft("");
+    const markRead = (current: Conversation[]) =>
+      current.map((conversation) =>
+        conversation.id === id ? { ...conversation, unread: false } : conversation,
+      );
+    if (completed) setCompletedConversations(markRead);
+    else setOpenConversations(markRead);
+  }, []);
+
+  useEffect(() => {
+    if (!conversationId) {
+      setActiveId(null);
+      setDraft("");
+      return;
+    }
+    selectConversation(conversationId);
+  }, [conversationId, selectConversation]);
   const conversations = showingCompleted ? completedConversations : openConversations;
   const setConversations = showingCompleted ? setCompletedConversations : setOpenConversations;
   const active = conversations.find((conversation) => conversation.id === activeId) ?? null;
@@ -132,16 +185,12 @@ export function ConversationsInbox() {
     setShowingCompleted((current) => !current);
     setActiveId(null);
     setDraft("");
+    router.replace("/conversas", { scroll: false });
   };
 
   const openConversation = (id: string) => {
-    setActiveId(id);
-    setDraft("");
-    setConversations((current) =>
-      current.map((conversation) =>
-        conversation.id === id ? { ...conversation, unread: false } : conversation,
-      ),
-    );
+    selectConversation(id);
+    router.replace(`/conversas?conversa=${id}`, { scroll: false });
   };
 
   const sendMessage = () => {
@@ -168,11 +217,11 @@ export function ConversationsInbox() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f6f7f3]">
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-[#f6f7f3]">
       <MarketplaceHeader />
 
-      <div className="mx-auto grid max-w-[1240px] gap-6 px-4 py-7 sm:px-6 lg:h-[calc(100vh-4rem)] lg:grid-cols-[380px_minmax(0,1fr)] lg:items-stretch lg:px-8 lg:py-8">
-        <section className={cn("min-w-0 lg:overflow-x-hidden lg:overflow-y-auto", active && "hidden lg:block")} aria-label="Lista de negociações">
+      <div className="mx-auto grid min-h-0 w-full max-w-[1240px] flex-1 grid-rows-[minmax(0,1fr)] gap-6 overflow-hidden px-4 py-7 sm:px-6 lg:grid-cols-[380px_minmax(0,1fr)] lg:px-8 lg:py-8">
+        <section className={cn("min-h-0 min-w-0 overflow-hidden", active && "hidden lg:block")} aria-label="Lista de negociações">
           <p className="text-[10px] font-black uppercase text-[#527637]">Suas negociações</p>
           <h1 className="mt-1 text-[30px] font-black leading-tight sm:text-[38px]">Negociações</h1>
           <p className="mt-2 text-sm text-muted-foreground">Três negociações em andamento. Abra uma para continuar.</p>
@@ -204,7 +253,7 @@ export function ConversationsInbox() {
 
         <section
           className={cn(
-            "flex min-h-[560px] flex-col overflow-hidden rounded-lg border bg-white lg:min-h-0",
+            "flex min-h-0 flex-col overflow-hidden rounded-lg border bg-white",
             !active && "hidden lg:flex",
           )}
           aria-label={active ? `Negociação com ${active.name}` : "Negociação"}
@@ -216,7 +265,11 @@ export function ConversationsInbox() {
               draft={draft}
               onDraftChange={setDraft}
               onSend={sendMessage}
-              onBack={() => setActiveId(null)}
+              onBack={() => {
+                setActiveId(null);
+                setDraft("");
+                router.replace("/conversas", { scroll: false });
+              }}
             />
           ) : (
             <div className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
@@ -293,14 +346,22 @@ function ConversationThread({
   onBack: () => void;
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const messageScrollerRef = useRef<HTMLDivElement>(null);
   const service = services.find(
     (item) => item.title === conversation.service && item.provider === conversation.name,
   );
 
+  useLayoutEffect(() => {
+    const scroller = messageScrollerRef.current;
+    if (!scroller) return;
+    if (scroller.scrollHeight <= scroller.clientHeight) return;
+    scroller.scrollTop = scroller.scrollHeight;
+  }, [conversation.messages.length]);
+
   return (
-    <div className="flex min-h-[560px] flex-1 flex-col lg:min-h-0">
-      <div className={cn("flex min-h-0 flex-1 flex-col gap-3 px-4 py-5 sm:px-5", detailsOpen ? "overflow-hidden" : "overflow-y-auto")}>
-        <header className={cn("flex flex-col overflow-hidden rounded-lg border bg-[#f7faf7]", detailsOpen && "min-h-0 flex-1")}>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className={cn("flex min-h-0 flex-1 flex-col gap-3 px-4 pt-5 pb-2 sm:px-5", detailsOpen && "overflow-hidden")}>
+        <header className={cn("flex shrink-0 flex-col overflow-hidden rounded-lg border bg-[#f7faf7]", detailsOpen && "min-h-0 flex-1")}>
           <div className="flex shrink-0 items-center gap-3 p-3">
             <button
               type="button"
@@ -339,31 +400,35 @@ function ConversationThread({
           )}
         </header>
 
-        {!detailsOpen && <ol className="flex flex-col gap-3">
-          {conversation.messages.map((message) => (
-            <li
-              key={message.id}
-              className={cn("flex max-w-[85%] flex-col gap-1", message.from === "you" ? "self-end items-end" : "self-start")}
-            >
-              <p
-                className={cn(
-                  "rounded-lg px-3 py-2 text-sm leading-6",
-                  message.from === "you" ? "bg-[#103f35] text-white" : "border bg-[#f7faf7]",
-                )}
-              >
-                {message.text}
-              </p>
-              <span className="text-[11px] font-semibold text-muted-foreground">
-                <span className="sr-only">{message.from === "you" ? "Você" : conversation.name}, </span>
-                {message.time}
-              </span>
-            </li>
-          ))}
-        </ol>}
+        {!detailsOpen && (
+          <div ref={messageScrollerRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+            <ol className="mt-auto flex flex-col gap-3">
+              {conversation.messages.map((message) => (
+                <li
+                  key={message.id}
+                  className={cn("flex max-w-[85%] flex-col gap-1", message.from === "you" ? "self-end items-end" : "self-start")}
+                >
+                  <p
+                    className={cn(
+                      "rounded-lg px-3 py-2 text-sm leading-6",
+                      message.from === "you" ? "bg-[#103f35] text-white" : "border bg-[#f7faf7]",
+                    )}
+                  >
+                    {message.text}
+                  </p>
+                  <span className="text-[11px] font-semibold text-muted-foreground">
+                    <span className="sr-only">{message.from === "you" ? "Você" : conversation.name}, </span>
+                    {message.time}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
       </div>
 
       <form
-        className="flex items-center gap-2 border-t p-3 sm:p-4"
+        className="px-3 pt-1 pb-3 sm:px-4 sm:pt-2 sm:pb-4"
         onSubmit={(event) => {
           event.preventDefault();
           onSend();
@@ -372,21 +437,23 @@ function ConversationThread({
         <label htmlFor="conversation-draft" className="sr-only">
           Mensagem para {conversation.name}
         </label>
-        <input
-          id="conversation-draft"
-          value={draft}
-          onChange={(event) => onDraftChange(event.target.value)}
-          placeholder="Escreva uma mensagem"
-          className="h-11 min-w-0 flex-1 rounded-md border bg-white px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        />
-        <button
-          type="submit"
-          disabled={!draft.trim()}
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-[#c9f24a] text-foreground hover:bg-[#d7fa68] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label="Enviar mensagem"
-        >
-          <SendHorizontal className="h-4 w-4" />
-        </button>
+        <div className="relative">
+          <input
+            id="conversation-draft"
+            value={draft}
+            onChange={(event) => onDraftChange(event.target.value)}
+            placeholder="Escreva uma mensagem"
+            className="h-14 w-full rounded-md border bg-white pl-3 pr-14 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+          <button
+            type="submit"
+            disabled={!draft.trim()}
+            className="absolute top-1/2 right-1.5 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-md bg-[#c9f24a] text-foreground hover:bg-[#d7fa68] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Enviar mensagem"
+          >
+            <SendHorizontal className="h-4 w-4" />
+          </button>
+        </div>
       </form>
     </div>
   );

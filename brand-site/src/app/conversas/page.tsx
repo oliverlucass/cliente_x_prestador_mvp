@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description: "Acompanhe suas negociações no Fechô.",
 };
 
-export default function ConversationsPage() {
-  return <ConversationsInbox />;
+export default async function ConversationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ conversa?: string }>;
+}) {
+  const { conversa } = await searchParams;
+  return <ConversationsInbox conversationId={conversa ?? null} />;
 }
