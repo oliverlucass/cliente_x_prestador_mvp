@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
-  ArrowDownUp, BriefcaseBusiness, CalendarDays, CheckCircle2, ChevronDown, CircleUserRound,
+  BriefcaseBusiness, CheckCircle2, ChevronDown, CircleUserRound,
   Compass, Heart, House, ListFilter,
   LocateFixed, Map as MapIcon, MapPin, MessageCircle, Navigation,
   Search, SlidersHorizontal,
@@ -12,7 +12,7 @@ import {
 import { BrandMark } from "@/components/brand/brand-logo";
 import { MarketplaceHeader } from "@/components/layout/marketplace-header";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { DistanceFilter } from "@/components/search/distance-filter";
+import { SearchFilters, type DateFilter, type SortMode } from "@/components/search/search-filters";
 import { ServiceCard } from "@/components/services/service-card";
 import { ServiceDetail } from "@/components/services/service-detail";
 import { categories, services } from "@/data/mock/services";
@@ -26,20 +26,6 @@ const categoryLabels: Record<string, string> = {
 
 const quickSearches = ["Pintor", "Eletricista", "Montador", "Diarista"];
 const neighborhoods = ["Vila Mariana, São Paulo", "Moema, São Paulo", "Pinheiros, São Paulo", "Tatuapé, São Paulo"];
-type DateFilter = "any" | "today" | "weekend";
-type SortMode = "default" | "distance" | "price" | "rating";
-
-const dateFilters = [
-  { label: "Qualquer dia", value: "any" as DateFilter, icon: CalendarDays },
-  { label: "Hoje", value: "today" as DateFilter, icon: CheckCircle2 },
-  { label: "Neste fim de semana", value: "weekend" as DateFilter, icon: CalendarDays },
-];
-
-const sortFilters = [
-  { label: "Mais perto", value: "distance" as SortMode, icon: MapPin },
-  { label: "Menor preço", value: "price" as SortMode, icon: ArrowDownUp },
-  { label: "Melhor avaliados", value: "rating" as SortMode, icon: CheckCircle2 },
-];
 
 export function MarketplaceHome() {
   const [query, setQuery] = useState("");
@@ -48,8 +34,8 @@ export function MarketplaceHome() {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [todayOnly, setTodayOnly] = useState(false);
   const [dateFilter, setDateFilter] = useState<DateFilter>("any");
-  const [sortMode, setSortMode] = useState<SortMode>("default");
-  const [showFilters, setShowFilters] = useState(false);
+  const [sortMode, setSortMode] = useState<SortMode>("distance");
+  const [showFilters, setShowFilters] = useState(true);
   const [radius, setRadius] = useState(5);
   const [view, setView] = useState<"list" | "map">("list");
   const [saved, setSaved] = useState<string[]>([]);
@@ -67,9 +53,9 @@ export function MarketplaceHome() {
 
     return result.sort((first, second) => {
       if (sortMode === "distance") return first.distance - second.distance;
-      if (sortMode === "price") return first.price - second.price;
-      if (sortMode === "rating") return second.rating - first.rating;
-      return 0;
+      if (sortMode === "price-asc") return first.price - second.price;
+      if (sortMode === "price-desc") return second.price - first.price;
+      return second.rating - first.rating;
     });
   }, [query, activeCategory, radius, todayOnly, dateFilter, sortMode]);
 
@@ -132,57 +118,24 @@ export function MarketplaceHome() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div><p className="text-xs font-bold uppercase text-[#527637]">Anúncios perto de {location.split(",")[0]}</p><h2 className="mt-1 text-2xl font-black sm:text-3xl">Escolha quem combina com você</h2><p className="mt-1 text-sm text-muted-foreground">{filtered.length} profissionais num raio de até {radius} km</p></div>
           <div className="flex gap-2">
-            <button type="button" onClick={() => setShowFilters((value) => !value)} className={cn("flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold", showFilters ? "border-foreground bg-muted" : "bg-white")}><SlidersHorizontal className="h-4 w-4" /> <span className="hidden sm:inline">Filtros</span></button>
+            <button type="button" onClick={() => setShowFilters((value) => !value)} aria-expanded={showFilters} aria-controls="search-filters" className={cn("flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold", showFilters ? "border-foreground bg-muted" : "bg-white")}><SlidersHorizontal className="h-4 w-4" /> <span className="hidden sm:inline">Filtros</span></button>
             <div className="flex rounded-md border bg-white p-1"><button type="button" onClick={() => setView("list")} className={cn("grid h-8 w-8 place-items-center rounded-sm", view === "list" && "bg-foreground text-background")} aria-label="Ver anúncios"><ListFilter className="h-4 w-4" /></button><button type="button" onClick={() => setView("map")} className={cn("grid h-8 w-8 place-items-center rounded-sm", view === "map" && "bg-foreground text-background")} aria-label="Ver mapa"><MapIcon className="h-4 w-4" /></button></div>
           </div>
         </div>
 
         {showFilters && (
-          <div className="mt-4 space-y-4 border-y bg-white py-4">
-            <DistanceFilter value={radius} onChange={setRadius} />
-            <div>
-              <p className="text-sm font-semibold">Data</p>
-              <div className="scrollbar-hide mt-2 flex gap-2 overflow-x-auto pb-1">
-              {dateFilters.map((item) => {
-                const Icon = item.icon;
-                const active = dateFilter === item.value;
-                return (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => {
-                      setDateFilter(item.value);
-                      setTodayOnly(item.value === "today");
-                    }}
-                    className={cn("flex h-9 shrink-0 items-center gap-1.5 rounded-full border bg-white px-3 text-xs font-semibold", active && "border-foreground bg-foreground text-white")}
-                  >
-                    <Icon className="h-3.5 w-3.5" /> {item.label}
-                  </button>
-                );
-              })}
-              </div>
-            </div>
-            <div>
-              <p className="text-sm font-semibold">Ordenar por</p>
-              <div className="scrollbar-hide mt-2 flex gap-2 overflow-x-auto pb-1">
-                {sortFilters.map((item) => {
-                  const Icon = item.icon;
-                  const active = sortMode === item.value;
-                  return (
-                    <button
-                      key={item.label}
-                      type="button"
-                      onClick={() => setSortMode(item.value)}
-                      className={cn("flex h-9 shrink-0 items-center gap-1.5 rounded-full border bg-white px-3 text-xs font-semibold", active && "border-foreground bg-foreground text-white")}
-                    >
-                      <Icon className="h-3.5 w-3.5" /> {item.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">Os preços publicados são definidos por cada profissional.</p>
-          </div>
+          <SearchFilters
+            className="mt-4"
+            radius={radius}
+            onRadiusChange={setRadius}
+            dateFilter={dateFilter}
+            onDateFilterChange={(value) => {
+              setDateFilter(value);
+              setTodayOnly(value === "today");
+            }}
+            sortMode={sortMode}
+            onSortModeChange={setSortMode}
+          />
         )}
 
         {view === "list" ? (

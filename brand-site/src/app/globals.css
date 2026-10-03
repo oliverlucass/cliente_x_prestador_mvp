@@ -118,28 +118,70 @@
 }
 
 @layer components {
-  .distance-slider::-webkit-slider-thumb {
-    appearance: none;
-    height: 14px;
-    width: 14px;
+  .distance-slider {
+    --distance-progress: 0%;
+    height: 24px;
+    background: transparent;
+    accent-color: #103f35;
+  }
+
+  .distance-slider::-webkit-slider-runnable-track {
+    height: 4px;
     border-radius: 9999px;
-    background: hsl(var(--foreground));
-    border: 2px solid hsl(var(--background));
-    box-shadow: 0 1px 4px rgba(20, 61, 50, 0.18);
+    background: linear-gradient(
+      to right,
+      #103f35 var(--distance-progress),
+      hsl(var(--border)) var(--distance-progress)
+    );
+  }
+
+  .distance-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    margin-top: -6px;
+    border-radius: 9999px;
+    background: #103f35;
+    border: 0;
+    box-shadow: 0 1px 2px rgba(16, 63, 53, 0.28);
     cursor: pointer;
   }
 
-  .distance-slider::-moz-range-thumb {
-    height: 14px;
-    width: 14px;
-    border-radius: 9999px;
-    background: hsl(var(--foreground));
-    border: 2px solid hsl(var(--background));
-    box-shadow: 0 1px 4px rgba(20, 61, 50, 0.18);
-    cursor: pointer;
+  .distance-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.06);
+  }
+
+  .distance-slider:active::-webkit-slider-thumb {
+    transform: scale(0.96);
   }
 
   .distance-slider::-moz-range-track {
-    background: transparent;
+    height: 4px;
+    border: 0;
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      #103f35 var(--distance-progress),
+      hsl(var(--border)) var(--distance-progress)
+    );
+  }
+
+  .distance-slider::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 9999px;
+    background: #103f35;
+    border: 0;
+    box-shadow: 0 1px 2px rgba(16, 63, 53, 0.28);
+    cursor: pointer;
+  }
+
+  .distance-slider:hover::-moz-range-thumb {
+    transform: scale(1.06);
+  }
+
+  .distance-slider:active::-moz-range-thumb {
+    transform: scale(0.96);
   }
 }

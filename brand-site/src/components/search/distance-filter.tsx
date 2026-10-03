@@ -1,5 +1,7 @@
 "use client";
 
+import type { CSSProperties } from "react";
+
 import { cn } from "@/lib/utils";
 
 type DistanceFilterProps = {
@@ -20,15 +22,10 @@ export function DistanceFilter({
   const progress = ((value - min) / (max - min)) * 100;
 
   return (
-    <div className={cn("w-full max-w-[240px]", className)}>
-      <div className="mb-1 flex items-baseline justify-between gap-2">
-        <label htmlFor="distance-filter" className="text-sm font-semibold">
-          Distância
-        </label>
-        <span className="text-xs font-semibold tabular-nums" aria-live="polite">
-          Até {value} km
-        </span>
-      </div>
+    <div className={cn("flex w-full items-center gap-3 sm:w-[360px]", className)}>
+      <label htmlFor="distance-filter" className="w-[6.25rem] shrink-0 text-sm font-medium tabular-nums text-foreground">
+        Até {value} km
+      </label>
       <input
         id="distance-filter"
         type="range"
@@ -41,15 +38,9 @@ export function DistanceFilter({
         aria-valuemax={max}
         aria-valuenow={value}
         aria-valuetext={`Até ${value} quilômetros`}
-        className="distance-slider h-1.5 w-full cursor-pointer appearance-none rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        style={{
-          background: `linear-gradient(to right, hsl(var(--foreground)) ${progress}%, hsl(var(--muted)) ${progress}%)`,
-        }}
+        className="distance-slider min-w-0 flex-1 cursor-pointer appearance-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        style={{ "--distance-progress": `${progress}%` } as CSSProperties}
       />
-      <div className="mt-1 flex justify-between text-[11px] text-muted-foreground">
-        <span>{min} km</span>
-        <span>{max} km</span>
-      </div>
     </div>
   );
 }
