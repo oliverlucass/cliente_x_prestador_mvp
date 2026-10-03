@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Bell } from "lucide-react";
+import { Bell, Mail } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -10,62 +9,105 @@ import { cn } from "@/lib/utils";
 type Notification = {
   id: string;
   name: string;
-  service: string;
+  label: string;
   text: string;
   time: string;
   unread: boolean;
-  avatar: string;
+  tone: "system" | "person";
 };
 
-const notifications: Notification[] = [
+const initialNotifications: Notification[] = [
+  {
+    id: "fecho-email",
+    name: "Fechô",
+    label: "Ação necessária",
+    text: "confirme seu e-mail para receber avisos de proposta.",
+    time: "Agora",
+    unread: false,
+    tone: "system",
+  },
   {
     id: "ana",
     name: "Ana Paula",
-    service: "Limpeza completa da sua casa",
-    text: "Posso ir sábado às 09:00. O valor fica R$ 180.",
+    label: "Nova proposta",
+    text: "sábado às 09:00, R$ 180.",
     time: "14:10",
     unread: true,
-    avatar: "/images/ana.jpg",
+    tone: "person",
   },
   {
     id: "carlos",
     name: "Carlos Mendes",
-    service: "Instalações e reparos elétricos",
-    text: "Consigo passar hoje. Fica R$ 150 pela visita.",
+    label: "Mensagem",
+    text: "pode ir hoje, fica R$ 150 pela visita.",
     time: "09:15",
-    unread: false,
-    avatar: "/images/carlos.jpg",
+    unread: true,
+    tone: "person",
   },
   {
     id: "rafael",
     name: "Rafael Nunes",
-    service: "Montagem de móveis e pequenos reparos",
-    text: "Fechado. Segunda às 14:00, R$ 120.",
+    label: "Mensagem",
+    text: "segunda às 14:00, R$ 120.",
     time: "Ontem",
     unread: false,
-    avatar: "/images/rafael.jpg",
-  },
-  {
-    id: "joao",
-    name: "João Oliveira",
-    service: "Pintura residencial sem bagunça",
-    text: "Fechado. Quarto por R$ 350, pintura na sexta.",
-    time: "Sex",
-    unread: false,
-    avatar: "/images/joao.jpg",
+    tone: "person",
   },
 ];
 
+function NotificationBody({ notification }: { notification: Notification }) {
+  return (
+    <span className="min-w-0 flex-1">
+      <span className="flex items-baseline justify-between gap-3">
+        <span className="min-w-0 truncate text-sm font-bold leading-5">{notification.name}</span>
+        <span className="shrink-0 text-[13px] leading-5 text-muted-foreground">{notification.time}</span>
+      </span>
+      <span className="mt-0.5 block text-sm leading-5 text-foreground">
+        <span className="font-bold">{notification.label}:</span> {notification.text}
+      </span>
+    </span>
+  );
+}
+
+function Avatar({ notification }: { notification: Notification }) {
+  if (notification.tone === "system") {
+    return (
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e4f59a] text-[#16382f]" aria-hidden="true">
+        <Mail className="h-[18px] w-[18px]" strokeWidth={2} />
+      </span>
+    );
+  }
+
+  return (
+    <span className="relative h-10 w-10 shrink-0" aria-hidden="true">
+      {notification.unread && (
+        <span className="absolute -left-3.5 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[#6cb82e]" />
+      )}
+      <span className="block h-10 w-10 rounded-full bg-[#d5ddd6]" />
+    </span>
+  );
+}
+
 export function NotificationMenu() {
   const [open, setOpen] = useState(false);
+  const [notifications, setNotifications] = useState(initialNotifications);
+  const [statusMessage, setStatusMessage] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
+  const titleId = useId();
   const router = useRouter();
   const hasUnread = notifications.some((notification) => notification.unread);
 
   const openChat = (id: string) => {
     setOpen(false);
     router.push(`/conversas?conversa=${id}`);
+  };
+
+  const markAllRead = () => {
+    setNotifications((current) =>
+      current.map((notification) => (notification.unread ? { ...notification, unread: false } : notification)),
+    );
+    setStatusMessage("Notificações marcadas como lidas.");
   };
 
   useEffect(() => {
@@ -113,51 +155,48 @@ export function NotificationMenu() {
         <div
           id={panelId}
           role="dialog"
-          aria-label="Notificações"
-          className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(22rem,calc(100vw-2rem))] rounded-xl border border-[#dce5d8] bg-white text-foreground shadow-[0_16px_40px_rgba(20,61,50,0.14)]"
+          aria-labelledby={titleId}
+          className="absolute right-0 top-[calc(100%+8px)] z-50 flex w-[min(21.5rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[20px] border border-[#e6eee4] bg-white text-foreground shadow-[0_18px_40px_rgba(16,40,32,0.12)]"
         >
-          <div className="px-4 pb-2 pt-3">
-            <p className="text-sm font-semibold leading-5">Notificações</p>
-            <p className="mt-0.5 text-xs leading-4 text-muted-foreground">Negociações</p>
-          </div>
-          <div className="mx-3 h-px bg-[#dce5d8]" role="separator" />
+          <header className="flex items-center justify-between gap-3 px-5 py-3.5">
+            <h2 id={titleId} className="text-base font-bold leading-6">
+              Notificações
+            </h2>
+            <button
+              type="button"
+              onClick={markAllRead}
+              disabled={!hasUnread}
+              className="rounded-md px-1 text-sm font-semibold text-[#1c7a46] transition hover:text-[#145c34] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:text-[#0e4a28] disabled:cursor-not-allowed disabled:text-[#8aa898]"
+            >
+              Marcar lidas
+            </button>
+          </header>
+          <p className="sr-only" aria-live="polite">
+            {statusMessage}
+          </p>
           {notifications.length === 0 ? (
-            <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-              Nenhuma notificação por enquanto.
-            </p>
+            <p className="px-5 py-8 text-center text-sm text-muted-foreground">Nenhuma notificação por enquanto.</p>
           ) : (
-            <ul className="max-h-[min(24rem,70vh)] overflow-y-auto p-2">
+            <ul className="max-h-[min(28rem,70vh)] overflow-y-auto">
               {notifications.map((notification) => (
-                <li key={notification.id}>
-                  <button
-                    type="button"
-                    onClick={() => openChat(notification.id)}
-                    className="flex h-[102px] w-full items-start gap-3 overflow-hidden rounded-lg px-2 py-2.5 text-left transition hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <span className="relative mt-0.5 h-9 w-9 shrink-0 overflow-hidden rounded-full bg-muted ring-1 ring-[#dce5d8]">
-                      <Image
-                        src={notification.avatar}
-                        alt=""
-                        fill
-                        sizes="36px"
-                        className="object-cover"
-                      />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-baseline justify-between gap-3">
-                        <span className="truncate text-sm font-semibold leading-5">{notification.name}</span>
-                        <span className="shrink-0 text-xs leading-4 text-muted-foreground">{notification.time}</span>
-                      </span>
-                      <span className="mt-0.5 block truncate text-xs leading-4 text-muted-foreground">
-                        {notification.service}
-                      </span>
-                      <span className="mt-1 line-clamp-2 h-10 text-sm leading-5 text-foreground">{notification.text}</span>
+                <li key={notification.id} className={cn(notification.tone === "system" && "bg-[#f3f6ea]")}>
+                  {notification.tone === "system" ? (
+                    // Inert until the confirm-email action exists.
+                    <div className="flex items-start gap-3 px-5 py-3.5">
+                      <Avatar notification={notification} />
+                      <NotificationBody notification={notification} />
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => openChat(notification.id)}
+                      className="flex w-full items-start gap-3 px-5 py-3 text-left transition-colors hover:bg-[#f4f7f2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:bg-[#e8f0e6]"
+                    >
+                      <Avatar notification={notification} />
+                      <NotificationBody notification={notification} />
                       {notification.unread && <span className="sr-only">Não lida</span>}
-                    </span>
-                    {notification.unread && (
-                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#a7ce32]" aria-hidden="true" />
-                    )}
-                  </button>
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
