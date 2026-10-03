@@ -54,7 +54,7 @@ function FilterRow({
   children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+    <div className="flex flex-col gap-2 sm:min-h-11 sm:flex-row sm:items-center sm:gap-6">
       <div id={id} className="flex shrink-0 items-center gap-2 text-sm font-medium text-foreground sm:w-32">
         <Icon className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
         {label}

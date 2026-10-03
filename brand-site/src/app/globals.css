@@ -118,10 +118,29 @@
 }
 
 @layer components {
+  .distance-slider {
+    --distance-progress: 0%;
+    height: 24px;
+    background: transparent;
+    accent-color: #103f35;
+  }
+
+  .distance-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      #103f35 var(--distance-progress),
+      hsl(var(--border)) var(--distance-progress)
+    );
+  }
+
   .distance-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
     appearance: none;
     height: 16px;
     width: 16px;
+    margin-top: -6px;
     border-radius: 9999px;
     background: #103f35;
     border: 0;
@@ -135,6 +154,17 @@
 
   .distance-slider:active::-webkit-slider-thumb {
     transform: scale(0.96);
+  }
+
+  .distance-slider::-moz-range-track {
+    height: 4px;
+    border: 0;
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      #103f35 var(--distance-progress),
+      hsl(var(--border)) var(--distance-progress)
+    );
   }
 
   .distance-slider::-moz-range-thumb {
@@ -153,9 +183,5 @@
 
   .distance-slider:active::-moz-range-thumb {
     transform: scale(0.96);
-  }
-
-  .distance-slider::-moz-range-track {
-    background: transparent;
   }
 }

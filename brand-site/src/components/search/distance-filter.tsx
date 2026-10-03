@@ -1,5 +1,7 @@
 "use client";
 
+import type { CSSProperties } from "react";
+
 import { cn } from "@/lib/utils";
 
 type DistanceFilterProps = {
@@ -20,7 +22,7 @@ export function DistanceFilter({
   const progress = ((value - min) / (max - min)) * 100;
 
   return (
-    <div className={cn("flex min-w-0 items-center gap-3", className)}>
+    <div className={cn("flex w-full items-center gap-3 sm:w-[360px]", className)}>
       <label htmlFor="distance-filter" className="w-[6.25rem] shrink-0 text-sm font-medium tabular-nums text-foreground">
         Até {value} km
       </label>
@@ -36,10 +38,8 @@ export function DistanceFilter({
         aria-valuemax={max}
         aria-valuenow={value}
         aria-valuetext={`Até ${value} quilômetros`}
-        className="distance-slider h-1 w-full max-w-[280px] cursor-pointer appearance-none rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        style={{
-          background: `linear-gradient(to right, #103f35 ${progress}%, hsl(var(--border)) ${progress}%)`,
-        }}
+        className="distance-slider min-w-0 flex-1 cursor-pointer appearance-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        style={{ "--distance-progress": `${progress}%` } as CSSProperties}
       />
     </div>
   );
