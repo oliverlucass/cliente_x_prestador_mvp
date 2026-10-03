@@ -120,23 +120,39 @@
 @layer components {
   .distance-slider::-webkit-slider-thumb {
     appearance: none;
-    height: 14px;
-    width: 14px;
+    height: 16px;
+    width: 16px;
     border-radius: 9999px;
-    background: hsl(var(--foreground));
-    border: 2px solid hsl(var(--background));
-    box-shadow: 0 1px 4px rgba(20, 61, 50, 0.18);
+    background: #103f35;
+    border: 0;
+    box-shadow: 0 1px 2px rgba(16, 63, 53, 0.28);
     cursor: pointer;
   }
 
+  .distance-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.06);
+  }
+
+  .distance-slider:active::-webkit-slider-thumb {
+    transform: scale(0.96);
+  }
+
   .distance-slider::-moz-range-thumb {
-    height: 14px;
-    width: 14px;
+    height: 16px;
+    width: 16px;
     border-radius: 9999px;
-    background: hsl(var(--foreground));
-    border: 2px solid hsl(var(--background));
-    box-shadow: 0 1px 4px rgba(20, 61, 50, 0.18);
+    background: #103f35;
+    border: 0;
+    box-shadow: 0 1px 2px rgba(16, 63, 53, 0.28);
     cursor: pointer;
+  }
+
+  .distance-slider:hover::-moz-range-thumb {
+    transform: scale(1.06);
+  }
+
+  .distance-slider:active::-moz-range-thumb {
+    transform: scale(0.96);
   }
 
   .distance-slider::-moz-range-track {
