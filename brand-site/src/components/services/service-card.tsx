@@ -12,8 +12,8 @@ interface ServiceCardProps {
   className?: string;
 }
 
-function formatStartingPrice(price: number) {
-  return `a partir de R$ ${price.toLocaleString("pt-BR")}`;
+function formatPriceAmount(price: number) {
+  return `R$ ${price.toLocaleString("pt-BR")}`;
 }
 
 function formatDistance(kilometers: number) {
@@ -21,9 +21,8 @@ function formatDistance(kilometers: number) {
 }
 
 export function ServiceCard({ service, onOpen, className }: ServiceCardProps) {
-  const price = formatStartingPrice(service.price);
+  const price = formatPriceAmount(service.price);
   const rating = service.rating.toFixed(2).replace(".", ",");
-  const reviews = service.reviewCount > 100 ? "100+" : String(service.reviewCount);
   const distance = formatDistance(service.distance);
 
   return (
@@ -35,12 +34,15 @@ export function ServiceCard({ service, onOpen, className }: ServiceCardProps) {
       >
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted">
           <Image
-            src={service.providerImageUrl}
-            alt=""
+            src={service.imageUrl}
+            alt={service.imageAlt}
             fill
             sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 25vw"
-            className="object-cover object-[center_20%] transition duration-500 group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            className="object-cover transition duration-500 group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
+          <span className="absolute bottom-3 left-3 h-10 w-10 overflow-hidden rounded-full bg-muted shadow-sm">
+            <Image src={service.providerImageUrl} alt="" fill sizes="40px" className="object-cover" />
+          </span>
           {service.availableToday && (
             <span className="absolute right-3 top-3 flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
               <Zap className="h-3.5 w-3.5 fill-lime-400 text-lime-500" aria-hidden="true" />
@@ -50,26 +52,27 @@ export function ServiceCard({ service, onOpen, className }: ServiceCardProps) {
         </div>
 
         <div className="pt-3">
-          <p className="truncate text-sm font-medium text-muted-foreground">{service.profession}</p>
-          <h3 className="mt-1 truncate text-[17px] font-semibold leading-5 text-foreground">{service.title}</h3>
-          <p className="mt-1 line-clamp-2 text-sm leading-5 text-muted-foreground">{service.description}</p>
-          <p className="mt-2 text-sm font-semibold text-foreground">{price}</p>
-          <p className="mt-2 flex items-center gap-1 text-sm font-semibold text-foreground">
-            <Star className="h-4 w-4 fill-foreground" aria-hidden="true" />
-            <span>
+          <p className="text-sm font-medium text-muted-foreground">{service.profession}</p>
+          <h3 className="mt-1 text-[17px] font-semibold leading-5 text-foreground">{service.title}</h3>
+          <p className="mt-2 flex items-baseline gap-2">
+            <span className="text-base font-semibold text-foreground">{price}</span>
+            <span className="text-sm text-muted-foreground">a partir</span>
+          </p>
+          <p className="mt-2 flex min-w-0 flex-nowrap items-center gap-2 text-sm">
+            <span className="flex shrink-0 items-center gap-1 font-semibold text-foreground">
+              <Star className="h-4 w-4 fill-foreground" aria-hidden="true" />
               <span className="sr-only">Avaliação </span>
               {rating}
-              <span className="font-medium text-muted-foreground"> ({reviews})</span>
             </span>
-          </p>
-          <p className="mt-1 flex min-w-0 items-center gap-1 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <span className="sr-only">Bairro </span>
-            <span className="truncate">{service.neighborhood}</span>
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            <span className="sr-only">Distância </span>
-            {distance}
+            <span className="flex min-w-0 items-center gap-1 text-muted-foreground">
+              <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span className="sr-only">Bairro </span>
+              <span className="truncate">{service.neighborhood}</span>
+            </span>
+            <span className="shrink-0 text-muted-foreground">
+              <span className="sr-only">Distância </span>
+              {distance}
+            </span>
           </p>
         </div>
       </button>
