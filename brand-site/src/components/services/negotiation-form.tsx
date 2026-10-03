@@ -175,19 +175,20 @@ export function NegotiationForm({ service, initialDate, initialOffer, initialLoc
               <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground"><MapPin className="h-3.5 w-3.5" />O endereço exato pode ser combinado depois.</p>
             </section>
 
-            <section className="border-b py-8"><SectionTitle number="03" title="Quando e por quanto" />
-              <div className="mt-6 grid gap-4 sm:grid-cols-2"><div><label htmlFor="request-date" className="text-sm font-bold">Data preferida</label><input id="request-date" type="date" min={new Date().toLocaleDateString("sv-SE")} value={values.date} onChange={(event) => update("date", event.target.value)} className={inputClass} /></div></div>
+            <section className="border-b py-8"><SectionTitle number="03" title="Quando precisa" />
+              <div className="mt-6"><label htmlFor="request-date" className="text-sm font-bold">Data preferida</label><input id="request-date" type="date" min={new Date().toLocaleDateString("sv-SE")} value={values.date} onChange={(event) => update("date", event.target.value)} className={inputClass} /></div>
               <ChoiceGroup className="mt-5" legend="Período" name="period" value={values.period} options={periods} onChange={(period) => update("period", period)} />
               <ChoiceGroup className="mt-5" legend="Prazo" name="urgency" value={values.urgency} options={urgencies} onChange={(urgency) => update("urgency", urgency)} />
-              <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="request-offer" className="text-sm font-bold">Valor que pretende pagar</label>
-                  <div className="relative mt-2">
-                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-bold text-muted-foreground">R$</span>
-                    <input id="request-offer" type="number" min="1" step="0.01" inputMode="decimal" value={values.offer} onChange={(event) => update("offer", event.target.value)} placeholder="A combinar" className="h-11 w-full rounded-md border bg-white pl-10 pr-3 text-sm text-foreground outline-none transition focus:border-[#357258] focus:ring-2 focus:ring-[#dcebdc]" />
-                  </div>
-                  <p className="mt-2 text-xs text-muted-foreground">O valor final depende da conversa com {service.provider.split(" ")[0]}.</p>
+            </section>
+
+            <section className="border-b py-8"><SectionTitle number="04" title="Por quanto" />
+              <div className="mt-6">
+                <label htmlFor="request-offer" className="text-sm font-bold">Valor que pretende pagar</label>
+                <div className="relative mt-2">
+                  <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-bold text-muted-foreground">R$</span>
+                  <input id="request-offer" type="number" min="1" step="0.01" inputMode="decimal" value={values.offer} onChange={(event) => update("offer", event.target.value)} placeholder="A combinar" className="h-11 w-full rounded-md border bg-white pl-10 pr-3 text-sm text-foreground outline-none transition focus:border-[#357258] focus:ring-2 focus:ring-[#dcebdc]" />
                 </div>
+                <p className="mt-2 text-xs text-muted-foreground">O valor final depende da conversa com {service.provider.split(" ")[0]}.</p>
               </div>
             </section>
 
