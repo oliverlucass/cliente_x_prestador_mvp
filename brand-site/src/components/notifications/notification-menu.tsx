@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Bell, Mail } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
@@ -14,6 +15,7 @@ type Notification = {
   time: string;
   unread: boolean;
   tone: "system" | "person";
+  avatar?: string;
 };
 
 const initialNotifications: Notification[] = [
@@ -34,15 +36,17 @@ const initialNotifications: Notification[] = [
     time: "14:10",
     unread: true,
     tone: "person",
+    avatar: "/images/ana.jpg",
   },
   {
     id: "carlos",
     name: "Carlos Mendes",
     label: "Mensagem",
-    text: "pode ir hoje, fica R$ 150 pela visita.",
+    text: "pode ir hoje, fica R$ 150 pela visita. Levo o material.",
     time: "09:15",
     unread: true,
     tone: "person",
+    avatar: "/images/carlos.jpg",
   },
   {
     id: "rafael",
@@ -52,38 +56,48 @@ const initialNotifications: Notification[] = [
     time: "Ontem",
     unread: false,
     tone: "person",
+    avatar: "/images/rafael.jpg",
+  },
+  {
+    id: "luciana",
+    name: "Luciana Prado",
+    label: "Nova proposta",
+    text: "sábado às 08:00, R$ 140.",
+    time: "Seg",
+    unread: false,
+    tone: "person",
+    avatar: "/images/luciana.jpg",
   },
 ];
 
-function NotificationBody({ notification }: { notification: Notification }) {
+function NotificationCopy({ notification }: { notification: Notification }) {
   return (
     <span className="min-w-0 flex-1">
-      <span className="flex items-baseline justify-between gap-3">
-        <span className="min-w-0 truncate text-sm font-bold leading-5">{notification.name}</span>
-        <span className="shrink-0 text-[13px] leading-5 text-muted-foreground">{notification.time}</span>
-      </span>
+      <span className="block truncate text-sm font-semibold leading-5">{notification.name}</span>
       <span className="mt-0.5 block text-sm leading-5 text-foreground">
-        <span className="font-bold">{notification.label}:</span> {notification.text}
+        <span className="font-semibold">{notification.label}:</span> {notification.text}
       </span>
     </span>
   );
 }
 
-function Avatar({ notification }: { notification: Notification }) {
+function NotificationAvatar({ notification }: { notification: Notification }) {
   if (notification.tone === "system") {
     return (
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e4f59a] text-[#16382f]" aria-hidden="true">
-        <Mail className="h-[18px] w-[18px]" strokeWidth={2} />
+      <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground" aria-hidden="true">
+        <Mail className="h-4 w-4" />
       </span>
     );
   }
 
   return (
-    <span className="relative h-10 w-10 shrink-0" aria-hidden="true">
+    <span className="relative mt-0.5 h-9 w-9 shrink-0">
       {notification.unread && (
-        <span className="absolute -left-3.5 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[#6cb82e]" />
+        <span className="absolute -left-3.5 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[#a7ce32]" aria-hidden="true" />
       )}
-      <span className="block h-10 w-10 rounded-full bg-[#d5ddd6]" />
+      <span className="relative block h-9 w-9 overflow-hidden rounded-full bg-muted ring-1 ring-[#dce5d8]">
+        <Image src={notification.avatar ?? ""} alt="" fill sizes="36px" className="object-cover" />
+      </span>
     </span>
   );
 }
@@ -156,17 +170,17 @@ export function NotificationMenu() {
           id={panelId}
           role="dialog"
           aria-labelledby={titleId}
-          className="absolute right-0 top-[calc(100%+8px)] z-50 flex w-[min(20.75rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[20px] border border-[#e6eee4] bg-white text-foreground shadow-[0_18px_40px_rgba(16,40,32,0.12)]"
+          className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(22rem,calc(100vw-2rem))] rounded-xl border border-[#dce5d8] bg-white text-foreground shadow-[0_16px_40px_rgba(20,61,50,0.14)]"
         >
-          <header className="flex items-center justify-between gap-3 py-3.5 pl-6 pr-5">
-            <h2 id={titleId} className="text-base font-bold leading-6">
+          <header className="flex items-center justify-between gap-3 py-3 pl-5 pr-4">
+            <h2 id={titleId} className="text-sm font-semibold leading-5">
               Notificações
             </h2>
             <button
               type="button"
               onClick={markAllRead}
               disabled={!hasUnread}
-              className="rounded-md px-1 text-sm font-semibold text-[#1c7a46] transition hover:text-[#145c34] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:text-[#0e4a28] disabled:cursor-not-allowed disabled:text-[#8aa898]"
+              className="rounded-md px-1 text-sm font-semibold leading-5 text-foreground transition hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
             >
               Marcar lidas
             </button>
@@ -175,25 +189,27 @@ export function NotificationMenu() {
             {statusMessage}
           </p>
           {notifications.length === 0 ? (
-            <p className="px-6 py-8 text-center text-sm text-muted-foreground">Nenhuma notificação por enquanto.</p>
+            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhuma notificação por enquanto.</p>
           ) : (
-            <ul className="max-h-[min(28rem,70vh)] overflow-y-auto">
+            <ul className="max-h-[min(24rem,70vh)] overflow-y-auto">
               {notifications.map((notification) => (
-                <li key={notification.id} className={cn(notification.tone === "system" && "bg-[#f3f6ea]")}>
+                <li key={notification.id} className={cn(notification.tone === "system" && "bg-[#eef3e9]")}>
                   {notification.tone === "system" ? (
                     // Inert until the confirm-email action exists.
-                    <div className="flex items-start gap-3 py-3.5 pl-6 pr-5">
-                      <Avatar notification={notification} />
-                      <NotificationBody notification={notification} />
+                    <div className="flex items-start gap-3 py-2.5 pl-5 pr-4">
+                      <NotificationAvatar notification={notification} />
+                      <NotificationCopy notification={notification} />
+                      <span className="shrink-0 text-xs leading-5 text-muted-foreground">{notification.time}</span>
                     </div>
                   ) : (
                     <button
                       type="button"
                       onClick={() => openChat(notification.id)}
-                      className="flex w-full items-start gap-3 py-3 pl-6 pr-5 text-left transition-colors hover:bg-[#f4f7f2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:bg-[#e8f0e6]"
+                      className="flex w-full items-start gap-3 py-2.5 pl-5 pr-4 text-left transition hover:bg-[#eef3e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:bg-muted"
                     >
-                      <Avatar notification={notification} />
-                      <NotificationBody notification={notification} />
+                      <NotificationAvatar notification={notification} />
+                      <NotificationCopy notification={notification} />
+                      <span className="shrink-0 text-xs leading-5 text-muted-foreground">{notification.time}</span>
                       {notification.unread && <span className="sr-only">Não lida</span>}
                     </button>
                   )}
