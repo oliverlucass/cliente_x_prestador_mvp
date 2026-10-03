@@ -156,9 +156,9 @@ export function NotificationMenu() {
           id={panelId}
           role="dialog"
           aria-labelledby={titleId}
-          className="absolute right-0 top-[calc(100%+8px)] z-50 flex w-[min(21.5rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[20px] border border-[#e6eee4] bg-white text-foreground shadow-[0_18px_40px_rgba(16,40,32,0.12)]"
+          className="absolute right-0 top-[calc(100%+8px)] z-50 flex w-[min(20.75rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[20px] border border-[#e6eee4] bg-white text-foreground shadow-[0_18px_40px_rgba(16,40,32,0.12)]"
         >
-          <header className="flex items-center justify-between gap-3 px-5 py-3.5">
+          <header className="flex items-center justify-between gap-3 py-3.5 pl-6 pr-5">
             <h2 id={titleId} className="text-base font-bold leading-6">
               Notificações
             </h2>
@@ -175,14 +175,14 @@ export function NotificationMenu() {
             {statusMessage}
           </p>
           {notifications.length === 0 ? (
-            <p className="px-5 py-8 text-center text-sm text-muted-foreground">Nenhuma notificação por enquanto.</p>
+            <p className="px-6 py-8 text-center text-sm text-muted-foreground">Nenhuma notificação por enquanto.</p>
           ) : (
             <ul className="max-h-[min(28rem,70vh)] overflow-y-auto">
               {notifications.map((notification) => (
                 <li key={notification.id} className={cn(notification.tone === "system" && "bg-[#f3f6ea]")}>
                   {notification.tone === "system" ? (
                     // Inert until the confirm-email action exists.
-                    <div className="flex items-start gap-3 px-5 py-3.5">
+                    <div className="flex items-start gap-3 py-3.5 pl-6 pr-5">
                       <Avatar notification={notification} />
                       <NotificationBody notification={notification} />
                     </div>
@@ -190,7 +190,7 @@ export function NotificationMenu() {
                     <button
                       type="button"
                       onClick={() => openChat(notification.id)}
-                      className="flex w-full items-start gap-3 px-5 py-3 text-left transition-colors hover:bg-[#f4f7f2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:bg-[#e8f0e6]"
+                      className="flex w-full items-start gap-3 py-3 pl-6 pr-5 text-left transition-colors hover:bg-[#f4f7f2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring active:bg-[#e8f0e6]"
                     >
                       <Avatar notification={notification} />
                       <NotificationBody notification={notification} />
