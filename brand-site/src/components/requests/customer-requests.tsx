@@ -3,33 +3,55 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import {
-  Banknote, CalendarDays, CircleUserRound,
-  Clock3, Compass, Heart, House, MapPin, User, Wrench,
-} from "lucide-react";
+import { CircleUserRound, Compass, Heart, House, Wrench } from "lucide-react";
 
 import { MarketplaceHeader } from "@/components/layout/marketplace-header";
 import { HistoryButton } from "@/components/requests/history-button";
-import { HistoryTimeline } from "@/components/requests/history-timeline";
+import { HistoryTimeline, type HistoryEvent } from "@/components/requests/history-timeline";
 import { cn } from "@/lib/utils";
 
 type RequestStatus = "Cancelada" | "Em andamento" | "Concluída";
 
-const customerRequests = [
+type CustomerRequest = {
+  id: number;
+  service: string;
+  provider: string;
+  providerImage: string;
+  status: RequestStatus;
+  date: string;
+  period: string;
+  deadline: string;
+  neighborhood: string;
+  city: string;
+  placeType: string;
+  price: string;
+  negotiations: number;
+  photo: string;
+  description: string;
+  materials: string;
+  observation: string;
+  history: HistoryEvent[];
+};
+
+const customerRequests: CustomerRequest[] = [
   {
     id: 1,
     service: "Limpeza completa da sua casa",
     provider: "Ana Paula",
     providerImage: "/images/ana.jpg",
-    status: "Cancelada" as RequestStatus,
+    status: "Cancelada",
     date: "Sábado, 19 de setembro",
-    time: "09:00",
-    location: "Saúde, São Paulo",
+    period: "Manhã",
+    deadline: "Nos próximos dias",
+    neighborhood: "Saúde",
+    city: "São Paulo",
+    placeType: "Residência",
     price: "R$ 180",
     negotiations: 6,
     photo: "/images/limpeza.jpg",
     description: "Apartamento com dois quartos, sala e cozinha. Incluir banheiros e área de serviço. O piso da sala precisa de atenção extra e os armários da cozinha estão com gordura acumulada.",
-    duration: "02:20",
+    materials: "Preciso que o prestador leve",
+    observation: "Interfone 42",
     history: [
       { date: "17 set", time: "10:35", title: "Pedido enviado", detail: "Você enviou a solicitação de limpeza para Ana." },
       { date: "18 set", time: "14:10", title: "Horário sugerido", detail: "Ana sugeriu sábado às 09:00." },
@@ -41,15 +63,19 @@ const customerRequests = [
     service: "Instalações e reparos elétricos",
     provider: "Carlos Mendes",
     providerImage: "/images/carlos.jpg",
-    status: "Em andamento" as RequestStatus,
+    status: "Em andamento",
     date: "Hoje",
-    time: "A combinar",
-    location: "Vila Mariana, São Paulo",
+    period: "Manhã",
+    deadline: "Flexível",
+    neighborhood: "Vila Mariana",
+    city: "São Paulo",
+    placeType: "Residência",
     price: "R$ 150",
     negotiations: 3,
     photo: "/images/eletrica.jpg",
-    description: "Troca de tomadas e revisão do quadro de luz da sala. Também preciso verificar o disjuntor que desarma quando o ar-condicionado liga junto com o chuveiro.",
-    duration: "00:30",
+    description: "Troca de tomadas e revisão do quadro de luz da sala. Também preciso verificar o disjuntor que desarma.",
+    materials: "A combinar",
+    observation: "Portão azul, interfone 12",
     history: [
       { date: "27 set", time: "11:40", title: "Pedido enviado", detail: "Você descreveu os reparos necessários." },
       { date: "28 set", time: "09:15", title: "Valor combinado", detail: "Carlos enviou o valor de R$ 150." },
@@ -61,15 +87,19 @@ const customerRequests = [
     service: "Montagem de móveis e pequenos reparos",
     provider: "Rafael Nunes",
     providerImage: "/images/rafael.jpg",
-    status: "Concluída" as RequestStatus,
+    status: "Concluída",
     date: "Segunda, 21 de setembro",
-    time: "14:00",
-    location: "Aclimação, São Paulo",
+    period: "Tarde",
+    deadline: "Flexível",
+    neighborhood: "Aclimação",
+    city: "São Paulo",
+    placeType: "Residência",
     price: "R$ 120",
     negotiations: 2,
     photo: "/images/montagem.jpg",
     description: "Guarda-roupa de três portas e uma estante pequena. As peças estão todas na sala e o manual de montagem está separado em um envelope.",
-    duration: "01:45",
+    materials: "Já tenho o necessário",
+    observation: "Peças na sala, manual no envelope",
     history: [
       { date: "19 set", time: "10:20", title: "Pedido enviado", detail: "Você solicitou a montagem dos móveis." },
       { date: "20 set", time: "16:30", title: "Horário confirmado", detail: "Rafael confirmou a visita." },
@@ -78,10 +108,10 @@ const customerRequests = [
   },
 ];
 
-const statusStyles: Record<RequestStatus, { badge: string; border: string }> = {
-  Cancelada: { badge: "bg-[#ffe2da] text-[#9f3825]", border: "border-l-[#9f3825]" },
-  "Em andamento": { badge: "bg-[#eef1ec] text-[#58665f]", border: "border-l-[#b7c0bb]" },
-  "Concluída": { badge: "bg-[#dcf0e7] text-[#1f644d]", border: "border-l-[#1f644d]" },
+const statusStyles: Record<RequestStatus, string> = {
+  Cancelada: "bg-[#ffe2da] text-[#9f3825]",
+  "Em andamento": "bg-[#eef1ec] text-[#58665f]",
+  "Concluída": "bg-[#dcf0e7] text-[#1f644d]",
 };
 
 const requestsInProgress = customerRequests.filter((request) => request.status === "Em andamento");
@@ -109,15 +139,76 @@ export function CustomerRequests() {
   </div>;
 }
 
-function RequestCard({ request }: { request: (typeof customerRequests)[number] }) {
+function RequestCard({ request }: { request: CustomerRequest }) {
   const [historyOpen, setHistoryOpen] = useState(false);
   const status = request.status;
-  return <article className={cn("overflow-hidden rounded-lg border border-l-[3px] bg-white", statusStyles[status].border)}>
-    <div className="grid items-center gap-4 p-4 sm:p-5 md:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]">
-      <div className="flex min-w-0 items-center gap-3"><span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={request.providerImage} alt={request.provider} fill sizes="48px" className="object-cover" /></span><div className="min-w-0"><h2 className="truncate font-black">{request.service}</h2><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><User className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">com </span><strong className="text-foreground/75">{request.provider}</strong></p><p className="mt-1 flex items-center gap-1 text-xs"><CalendarDays className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span><span className="sr-only">Quando </span><span className="font-bold">{request.date}</span><span className="text-muted-foreground"> - {request.time}</span></span></p><p className="mt-1 flex items-center gap-1 text-xs"><MapPin className="h-3.5 w-3.5 shrink-0 text-muted-foreground" aria-hidden="true" /><span className="sr-only">Onde </span><span className="font-bold">{request.location}</span></p></div></div>
-      <div className="flex min-w-0 items-stretch gap-3 border-t py-3 md:border-l md:border-t-0 md:px-5 md:py-0"><span className="relative w-20 shrink-0 self-stretch overflow-hidden rounded-md border bg-muted"><Image src={request.photo} alt="" fill sizes="80px" className="object-cover" /></span><div className="flex min-w-0 flex-col justify-center"><p className="line-clamp-2 text-sm text-muted-foreground">{request.description}</p><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Clock3 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">Duração </span><strong className="text-foreground/75">{request.duration}</strong></p><p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Banknote className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /><span className="sr-only">Preço </span><strong className="text-foreground/75">{request.price}</strong></p></div></div>
-    </div>
-    <div className="flex min-h-[41px] flex-wrap items-center gap-2 border-t bg-[#f7faf7] px-4 py-3 text-xs sm:px-5"><span className={cn("rounded-full px-2.5 py-1 text-[9px] font-black uppercase", statusStyles[status].badge)}>{status}</span><span className="text-muted-foreground" aria-hidden="true">·</span><p className="font-semibold">{request.negotiations} {request.negotiations === 1 ? "Negociação" : "Negociações"}</p><HistoryButton open={historyOpen} onClick={() => setHistoryOpen((open) => !open)} className="ml-auto" /></div>
-    {historyOpen && <HistoryTimeline events={request.history} tone={status === "Cancelada" ? "danger" : status === "Concluída" ? "success" : "default"} />}
-  </article>;
+  const notes = [request.materials, request.observation].filter((part) => part.trim()).join(" · ");
+
+  return (
+    <article className="overflow-hidden rounded-lg border bg-white">
+      <div className="px-4 py-5 sm:px-5">
+        <div className="flex items-center gap-3">
+          <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
+            <Image src={request.providerImage} alt="" fill sizes="40px" className="object-cover" />
+          </span>
+          <p className="min-w-0 truncate text-sm font-bold text-foreground sm:text-base">{request.provider}</p>
+        </div>
+        <h2 className="mt-4 text-xl font-black leading-tight text-foreground sm:text-2xl">{request.service}</h2>
+        <p className="mt-2 flex flex-wrap gap-x-8 gap-y-1 text-sm text-muted-foreground">
+          <span>
+            <span className="sr-only">Data </span>
+            {request.date}
+            <span aria-hidden="true"> · </span>
+            <span className="sr-only">Período </span>
+            {request.period}
+            <span aria-hidden="true"> · </span>
+            <span className="sr-only">Prazo </span>
+            {request.deadline}
+          </span>
+          <span>
+            <span className="sr-only">Bairro e cidade </span>
+            {request.neighborhood}, {request.city}
+            <span aria-hidden="true"> · </span>
+            <span className="sr-only">Tipo de local </span>
+            {request.placeType}
+          </span>
+        </p>
+      </div>
+
+      <div className="border-t px-4 py-5 sm:px-5">
+        <div className="flex items-start gap-3">
+          <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted">
+            <Image src={request.photo} alt="" fill sizes="56px" className="object-cover" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm leading-6 text-foreground">{request.description}</p>
+            {notes ? (
+              <p className="mt-2 text-sm text-muted-foreground">
+                {request.materials.trim() ? (
+                  <>
+                    <span className="sr-only">Materiais </span>
+                    {request.materials}
+                  </>
+                ) : null}
+                {request.materials.trim() && request.observation.trim() ? <span aria-hidden="true"> · </span> : null}
+                {request.observation.trim() ? (
+                  <>
+                    <span className="sr-only">Observação </span>
+                    {request.observation}
+                  </>
+                ) : null}
+              </p>
+            ) : null}
+            <p className="mt-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <span className="text-sm text-muted-foreground">Pretende pagar</span>
+              <span className="ml-auto text-2xl font-black leading-none text-foreground sm:text-[28px]">{request.price}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex min-h-[41px] flex-wrap items-center gap-2 border-t bg-[#f7faf7] px-4 py-3 text-xs sm:px-5"><span className={cn("rounded-full px-2.5 py-1 text-[9px] font-black uppercase", statusStyles[status])}>{status}</span><span className="text-muted-foreground" aria-hidden="true">·</span><p className="font-semibold">{request.negotiations} {request.negotiations === 1 ? "Negociação" : "Negociações"}</p><HistoryButton open={historyOpen} onClick={() => setHistoryOpen((open) => !open)} className="ml-auto" /></div>
+      {historyOpen && <HistoryTimeline events={request.history} tone={status === "Cancelada" ? "danger" : status === "Concluída" ? "success" : "default"} />}
+    </article>
+  );
 }
