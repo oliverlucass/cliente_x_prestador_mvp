@@ -17,6 +17,7 @@ export type NegotiationRequest = {
   description: string;
   photos: RequestPhoto[];
   neighborhood: string;
+  city: string;
   cep: string;
   street: string;
   number: string;
@@ -120,7 +121,8 @@ function NegotiationRequestDetails({
       <RequestSection number="02" title="Local">
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <RequestField label="Bairro" value={request.neighborhood} />
-          <RequestField label="CEP" value={request.cep} />
+          <RequestField label="Cidade" value={request.city} />
+          <RequestField className="sm:col-span-2" label="CEP" value={request.cep} />
           <RequestField className="sm:col-span-2" label="Rua e número" value={`${request.street}, ${request.number}`} />
           <RequestField label="Complemento" value={request.complement} />
           <RequestField label="Tipo de local" value={request.placeType} />
