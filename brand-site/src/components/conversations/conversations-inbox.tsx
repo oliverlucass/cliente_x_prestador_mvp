@@ -3,12 +3,11 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, BadgeCheck, ChevronDown, MapPin, SendHorizontal, Star } from "lucide-react";
+import { ArrowLeft, SendHorizontal } from "lucide-react";
 
+import { NegotiationRequestCard, type NegotiationRequest } from "@/components/conversations/negotiation-request-card";
 import { MarketplaceHeader } from "@/components/layout/marketplace-header";
-import { services } from "@/data/mock/services";
 import { cn } from "@/lib/utils";
-import type { Service } from "@/types/service";
 
 type Message = {
   id: string;
@@ -26,6 +25,7 @@ type Conversation = {
   unread: boolean;
   avatar: string;
   photo: string;
+  request: NegotiationRequest;
   messages: Message[];
 };
 
@@ -39,6 +39,24 @@ const initialConversations: Conversation[] = [
     unread: true,
     avatar: "/images/ana.jpg",
     photo: "/images/limpeza.jpg",
+    request: {
+      title: "Limpeza completa no sábado",
+      description: "Apartamento com dois quartos, sala e cozinha. Preciso de limpeza completa no sábado de manhã, com atenção extra no piso da sala e nos armários da cozinha.",
+      photos: [{ id: "ana-foto-1", src: "/images/limpeza.jpg", alt: "Foto da sala e da cozinha que precisam de limpeza" }],
+      neighborhood: "Saúde",
+      city: "São Paulo",
+      cep: "04055-000",
+      street: "Rua Loefgreen",
+      number: "1200",
+      complement: "Apto 42",
+      placeType: "Residência",
+      observation: "Portão azul, interfone 12",
+      preferredDate: "Sábado, 3 de outubro",
+      period: "Manhã",
+      deadline: "Nos próximos dias",
+      materials: "Preciso que o prestador leve",
+      offer: 180,
+    },
     messages: [
       { id: "ana-1", from: "you", text: "Oi Ana, preciso de uma limpeza completa no sábado.", time: "13:42" },
       { id: "ana-2", from: "them", text: "Posso ir sábado às 09:00. O valor fica R$ 180.", time: "14:10" },
@@ -53,6 +71,24 @@ const initialConversations: Conversation[] = [
     unread: false,
     avatar: "/images/carlos.jpg",
     photo: "/images/eletrica.jpg",
+    request: {
+      title: "Disjuntor desarma com o ar e o chuveiro",
+      description: "O disjuntor desarma quando o ar-condicionado liga junto com o chuveiro. Quero o diagnóstico e o reparo do quadro.",
+      photos: [{ id: "carlos-foto-1", src: "/images/eletrica.jpg", alt: "Foto do quadro que desarma" }],
+      neighborhood: "Vila Mariana",
+      city: "São Paulo",
+      cep: "04012-000",
+      street: "Rua Domingos de Morais",
+      number: "256",
+      complement: "Sem complemento",
+      placeType: "Residência",
+      observation: "Quadro de luz no corredor",
+      preferredDate: "Sábado, 3 de outubro",
+      period: "Tarde",
+      deadline: "Urgente",
+      materials: "Já tenho o necessário",
+      offer: 150,
+    },
     messages: [
       { id: "carlos-1", from: "you", text: "O disjuntor desarma quando o ar liga junto com o chuveiro.", time: "08:50" },
       { id: "carlos-2", from: "them", text: "Consigo passar hoje. Fica R$ 150 pela visita.", time: "09:15" },
@@ -67,6 +103,24 @@ const initialConversations: Conversation[] = [
     unread: false,
     avatar: "/images/rafael.jpg",
     photo: "/images/montagem.jpg",
+    request: {
+      title: "Guarda-roupa e estante na sala",
+      description: "Guarda-roupa de três portas e uma estante na sala. As peças já estão no local e o manual está separado.",
+      photos: [{ id: "rafael-foto-1", src: "/images/montagem.jpg", alt: "Foto das peças do guarda-roupa na sala" }],
+      neighborhood: "Aclimação",
+      city: "São Paulo",
+      cep: "01531-001",
+      street: "Rua Muniz de Sousa",
+      number: "88",
+      complement: "Casa 2",
+      placeType: "Residência",
+      observation: "Peças na sala, manual no envelope",
+      preferredDate: "Segunda, 5 de outubro",
+      period: "Tarde",
+      deadline: "Flexível",
+      materials: "Já tenho o necessário",
+      offer: 120,
+    },
     messages: [
       { id: "rafael-1", from: "you", text: "Guarda-roupa de três portas e uma estante na sala.", time: "Ontem" },
       { id: "rafael-2", from: "them", text: "Fechado. Segunda às 14:00, R$ 120.", time: "Ontem" },
@@ -84,6 +138,24 @@ const completedNegotiations: Conversation[] = [
     unread: false,
     avatar: "/images/joao.jpg",
     photo: "/images/pintura.jpg",
+    request: {
+      title: "Pintura do quarto",
+      description: "Pintar o quarto com os móveis no lugar. A parede tem marcas e precisa de correção antes da tinta.",
+      photos: [{ id: "joao-foto-1", src: "/images/pintura.jpg", alt: "Foto da parede do quarto com marcas" }],
+      neighborhood: "Ipiranga",
+      city: "São Paulo",
+      cep: "04216-030",
+      street: "Rua Silva Bueno",
+      number: "410",
+      complement: "Apto 71",
+      placeType: "Residência",
+      observation: "Móveis ficam no lugar",
+      preferredDate: "Sexta, 2 de outubro",
+      period: "Manhã",
+      deadline: "Nos próximos dias",
+      materials: "Preciso que o prestador leve",
+      offer: 350,
+    },
     messages: [
       { id: "joao-1", from: "you", text: "Preciso pintar o quarto. Os móveis ficam no lugar.", time: "Qui" },
       { id: "joao-2", from: "them", text: "Fechado. Quarto por R$ 350, pintura na sexta.", time: "Sex" },
@@ -98,6 +170,24 @@ const completedNegotiations: Conversation[] = [
     unread: false,
     avatar: "/images/marcos.jpg",
     photo: "/images/hidraulica.jpg",
+    request: {
+      title: "Torneira da cozinha pingando",
+      description: "A torneira da cozinha não para de pingar. O registro fecha, mas a goteira continua.",
+      photos: [{ id: "marcos-foto-1", src: "/images/hidraulica.jpg", alt: "Foto da torneira da cozinha que pinga" }],
+      neighborhood: "Moema",
+      city: "São Paulo",
+      cep: "04503-010",
+      street: "Alameda dos Nhambiquaras",
+      number: "320",
+      complement: "Sem complemento",
+      placeType: "Residência",
+      observation: "Torneira da pia da cozinha",
+      preferredDate: "Segunda, 28 de setembro",
+      period: "Manhã",
+      deadline: "Urgente",
+      materials: "Preciso que o prestador leve",
+      offer: 90,
+    },
     messages: [
       { id: "marcos-1", from: "you", text: "A torneira da cozinha não para de pingar.", time: "Dom" },
       { id: "marcos-2", from: "them", text: "Vazamento resolvido. Ficou R$ 90 pela visita.", time: "Seg" },
@@ -112,6 +202,24 @@ const completedNegotiations: Conversation[] = [
     unread: false,
     avatar: "/images/luciana.jpg",
     photo: "/images/jardinagem.jpg",
+    request: {
+      title: "Poda da cerca viva",
+      description: "A cerca viva passou da altura do muro. Preciso de poda e retirada dos galhos.",
+      photos: [{ id: "luciana-foto-1", src: "/images/jardinagem.jpg", alt: "Foto da cerca viva acima do muro" }],
+      neighborhood: "Brooklin",
+      city: "São Paulo",
+      cep: "04562-001",
+      street: "Rua Joaquim Floriano",
+      number: "150",
+      complement: "Sem complemento",
+      placeType: "Área externa",
+      observation: "Cerca viva no muro da frente",
+      preferredDate: "Sábado, 26 de setembro",
+      period: "Manhã",
+      deadline: "Flexível",
+      materials: "Preciso que o prestador leve",
+      offer: 140,
+    },
     messages: [
       { id: "luciana-1", from: "you", text: "A cerca viva passou da altura do muro.", time: "Sex" },
       { id: "luciana-2", from: "them", text: "Poda feita. Duas horas, R$ 140 no total.", time: "Sáb" },
@@ -347,9 +455,6 @@ function ConversationThread({
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const messageScrollerRef = useRef<HTMLDivElement>(null);
-  const service = services.find(
-    (item) => item.title === conversation.service && item.provider === conversation.name,
-  );
 
   useLayoutEffect(() => {
     const scroller = messageScrollerRef.current;
@@ -361,8 +466,14 @@ function ConversationThread({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className={cn("flex min-h-0 flex-1 flex-col gap-3 px-4 pt-5 pb-2 sm:px-5", detailsOpen && "overflow-hidden")}>
-        <header className={cn("flex shrink-0 flex-col overflow-hidden rounded-lg border bg-[#f7faf7]", detailsOpen && "min-h-0 flex-1")}>
-          <div className="flex shrink-0 items-center gap-3 p-3">
+        <NegotiationRequestCard
+          name={conversation.name}
+          avatarSrc={conversation.avatar}
+          time={conversation.time}
+          request={conversation.request}
+          open={detailsOpen}
+          onToggle={() => setDetailsOpen((open) => !open)}
+          leading={
             <button
               type="button"
               onClick={onBack}
@@ -371,34 +482,8 @@ function ConversationThread({
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <button
-              type="button"
-              onClick={() => setDetailsOpen((open) => !open)}
-              aria-expanded={detailsOpen}
-              aria-controls="conversation-service-details"
-              className="flex min-w-0 flex-1 items-center gap-3 rounded-md text-left hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-muted">
-                <Image src={conversation.avatar} alt="" fill sizes="44px" className="object-cover" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate font-black">{conversation.name}</span>
-                <span className="block truncate text-xs text-muted-foreground">{conversation.service}</span>
-                <span className="sr-only">{detailsOpen ? "Fechar detalhes" : "Ver detalhes"}</span>
-              </span>
-              <span className="relative hidden h-12 w-16 shrink-0 overflow-hidden rounded-md bg-muted sm:block">
-                <Image src={conversation.photo} alt="" fill sizes="64px" className="object-cover" />
-              </span>
-              <ChevronDown className={cn("h-4 w-4 shrink-0 text-muted-foreground transition", detailsOpen && "rotate-180")} />
-            </button>
-          </div>
-
-          {detailsOpen && (
-            <div id="conversation-service-details" className="min-h-0 flex-1 overflow-y-auto border-t">
-              <ServiceDetails conversation={conversation} service={service} />
-            </div>
-          )}
-        </header>
+          }
+        />
 
         {!detailsOpen && (
           <div ref={messageScrollerRef} className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
@@ -455,92 +540,6 @@ function ConversationThread({
           </button>
         </div>
       </form>
-    </div>
-  );
-}
-
-function ServiceDetails({ conversation, service }: { conversation: Conversation; service?: Service }) {
-  if (!service) {
-    return (
-      <div className="px-4 py-4">
-        <p className="font-black">{conversation.name}</p>
-        <p className="mt-1 text-sm text-muted-foreground">{conversation.service}</p>
-      </div>
-    );
-  }
-
-  const availability = service.availableToday && service.availableWeekend
-    ? "Hoje e fim de semana"
-    : service.availableToday
-      ? "Disponível hoje"
-      : service.availableWeekend
-        ? "Fim de semana"
-        : "Sob consulta";
-
-  return (
-    <div className="flex flex-col gap-4 px-4 py-4">
-      <div className="relative h-40 overflow-hidden rounded-md bg-muted">
-        <Image src={service.imageUrl} alt={service.imageAlt} fill sizes="640px" className="object-cover" />
-      </div>
-
-      <div>
-        <p className="text-[10px] font-black uppercase text-[#527637]">{service.category}</p>
-        <h2 className="mt-1 text-lg font-black leading-snug">{service.title}</h2>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">{service.description}</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {service.tags.map((tag) => (
-            <span key={tag} className="rounded-md bg-[#D7FA68] px-2.5 py-1 text-xs font-medium">{tag}</span>
-          ))}
-        </div>
-      </div>
-
-      <p>
-        <span className="text-lg font-black">{service.priceLabel}</span>
-        <span className="ml-2 text-sm text-muted-foreground">{service.priceDetail}</span>
-      </p>
-
-      <div className="flex items-center gap-3 border-t pt-4">
-        <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-muted">
-          <Image src={service.providerImageUrl} alt="" fill sizes="48px" className="object-cover" />
-        </span>
-        <span className="min-w-0">
-          <span className="flex items-center gap-1 font-black">
-            {service.provider}
-            {service.verified && <BadgeCheck className="h-4 w-4 fill-[#103f35] text-white" aria-label="Verificado" />}
-          </span>
-          <span className="block text-sm text-muted-foreground">{service.profession}</span>
-        </span>
-      </div>
-
-      <dl className="grid gap-3 text-sm sm:grid-cols-2">
-        <div>
-          <dt className="text-xs text-muted-foreground">Avaliação</dt>
-          <dd className="mt-1 flex items-center gap-1 font-semibold">
-            <Star className="h-3.5 w-3.5 fill-foreground" />
-            {service.rating.toFixed(2).replace(".", ",")}
-            <span className="font-medium text-muted-foreground">· {service.reviewCount} avaliações</span>
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-muted-foreground">Serviços feitos</dt>
-          <dd className="mt-1 font-semibold">{service.completedJobs}</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-muted-foreground">Onde atende</dt>
-          <dd className="mt-1 flex items-start gap-1 font-semibold">
-            <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            {service.neighborhood}, {service.city} · {service.distance.toFixed(1).replace(".", ",")} km
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-muted-foreground">Resposta</dt>
-          <dd className="mt-1 font-semibold">{service.responseTime}</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-muted-foreground">Disponibilidade</dt>
-          <dd className="mt-1 font-semibold">{availability}</dd>
-        </div>
-      </dl>
     </div>
   );
 }
