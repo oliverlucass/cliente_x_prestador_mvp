@@ -181,7 +181,7 @@ function RequestCard({ request }: { request: CustomerRequest }) {
             <Image src={request.photo} alt="" fill sizes="56px" className="object-cover" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm leading-6 text-foreground">{request.description}</p>
+            <p className="line-clamp-2 text-sm leading-6 text-foreground">{request.description}</p>
             {notes ? (
               <p className="mt-2 text-sm text-muted-foreground">
                 {request.materials.trim() ? (
