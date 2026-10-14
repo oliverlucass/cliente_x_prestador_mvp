@@ -10,8 +10,8 @@ import {
 
 import { cn } from "@/lib/utils";
 import { AvailabilityCalendar } from "@/components/services/availability-calendar";
-import { ProviderReviews } from "@/components/services/provider-reviews";
 import { ServiceNegotiation } from "@/components/services/service-negotiation";
+import { ServiceOffers } from "@/components/services/service-offers";
 import type { Service } from "@/types/service";
 
 interface ServiceDetailProps {
@@ -91,7 +91,7 @@ export function ServiceDetail({ service, searchLocation, saved, onSave, onClose 
             </div>
 
             <div className="mt-6 flex items-center gap-3 border-t py-5"><div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-muted"><Image src={service.providerImageUrl} alt={service.provider} fill sizes="56px" className="object-cover" /></div><div className="min-w-0 flex-1"><p className="flex items-center gap-1 font-semibold">{service.provider} {service.verified && <BadgeCheck className="h-4 w-4 fill-foreground text-white" />}</p><p className="flex items-center gap-1.5 text-sm text-muted-foreground"><Hammer className="h-4 w-4 shrink-0" /> {service.profession} · {service.completedJobs} serviços</p><p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground"><Home className="h-4 w-4 shrink-0" /> {service.neighborhood}, {service.city} · {service.distance.toFixed(1).replace(".", ",")} km</p><p className="mt-1 text-xs font-medium text-[#327054]">{service.responseTime}</p></div></div>
-            <ProviderReviews service={service} />
+            <ServiceOffers serviceId={service.id} />
 
             <div className="mt-8">
               <h3 className="text-lg font-bold">Disponibilidade de {service.provider.split(" ")[0]}</h3>
